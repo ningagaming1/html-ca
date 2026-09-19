@@ -74,7 +74,8 @@
         }
 
         .cta-nav-btn:hover {
-            border: 3px solid black;
+            background-color: #b10320;
+            border-color: #b10320;
             color: #fff;
         }
 
@@ -174,11 +175,14 @@
             font-size: 14px;
         }
 
-        /* Feedback Table Section */
+        /* ------------------------------------------------------------- */
+        /* CAROUSEL & FEEDBACK CARD STYLES                               */
+        /* ------------------------------------------------------------- */
         .feedback-section {
             padding: 60px 40px;
             max-width: 1200px;
             margin: 0 auto;
+            overflow: hidden;
         }
 
         .feedback-section h2 {
@@ -186,31 +190,59 @@
             margin-bottom: 20px;
         }
 
-        .satisfaction-table {
+        .carousel-wrapper {
             width: 100%;
-            border-collapse: collapse;
+            overflow: hidden;
+            position: relative;
+            padding: 10px 0;
         }
 
-        .satisfaction-table th {
-            background-color: #f1f3f5;
-            text-align: left;
-            padding: 12px;
-            border-bottom: 2px solid #ccc;
+        .carousel-track {
+            display: flex;
+            gap: 25px;
+            width: max-content;
+            animation: scroll 25s linear infinite;
         }
 
-        .satisfaction-table td {
-            padding: 12px;
-            border-bottom: 1px solid #e9ecef;
+        .carousel-wrapper:hover .carousel-track {
+            animation-play-state: paused;
         }
 
-        .satisfaction-table tbody tr:nth-child(even) {
-            background-color: #fdfdfd;
+        .feedback-card {
+            width: 320px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-author h4 {
+            font-size: 16px;
+            color: #111;
+        }
+
+        .card-author span {
+            font-size: 12px;
+            color: #777;
         }
 
         .rating {
             font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
         }
 
         .rating-high {
@@ -221,6 +253,27 @@
         .rating-low {
             background-color: #fee2e2;
             color: #991b1b;
+        }
+
+        .card-body {
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 10px;
+        }
+
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
         /* Footer */
@@ -294,44 +347,11 @@
         <section id="feedback" class="feedback-section">
             <h2>Client Satisfaction & Feedback</h2>
             
-            <table class="satisfaction-table">
-                <thead>
-                    <tr>
-                        <th>Member Name</th>
-                        <th>Assigned Trainer</th>
-                        <th>Rating</th>
-                        <th>Category</th>
-                        <th>Feedback / Comments</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Aman Sharma</td>
-                        <td>John Doe</td>
-                        <td><span class="rating rating-high">5 ★</span></td>
-                        <td>Facilities</td>
-                        <td>Equipment is well maintained and clean!</td>
-                        <td>18 Sep 2026</td>
-                    </tr>
-                    <tr>
-                        <td>Priya Patel</td>
-                        <td>Sarah Connor</td>
-                        <td><span class="rating rating-high">4 ★</span></td>
-                        <td>Trainer</td>
-                        <td>Great workout plan, seeing solid results.</td>
-                        <td>17 Sep 2026</td>
-                    </tr>
-                    <tr>
-                        <td>Rohan Verma</td>
-                        <td>Unassigned</td>
-                        <td><span class="rating rating-low">2 ★</span></td>
-                        <td>Locker Room</td>
-                        <td>Showers need better water pressure.</td>
-                        <td>15 Sep 2026</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="carousel-wrapper">
+                <div class="carousel-track" id="feedback-track">
+                    <p>Loading member feedback...</p>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -340,5 +360,7 @@
         <p>&copy; 2026 xyx gym Management System. Built by team Titan's.</p>
     </footer>
 
+    <!-- SCRIPT LINK CONNECTING YOUR JAVASCRIPT FILE -->
+    <script src="feedback.js"></script>
 </body>
 </html>
