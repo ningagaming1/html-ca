@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xyx gym - Management Software</title>
+    <style>
+        /* CSS Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            color: #333;
+            line-height: 1.6;
+            background-color: #fdfdfd;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #111;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+            align-items: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #444;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #d90429;
+        }
+
+        .login-btn {
+            border: 2px solid #111;
+            border-radius: 6px;
+            background-color: transparent;
+            color: #111;
+            padding: 6px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #111;
+            color: #fff;
+        }
+
+        .cta-nav-btn {
+            background-color: #d90429;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 6px;
+            border: 3px solid #d90429;
+        }
+
+        .cta-nav-btn:hover {
+            border: 3px solid black;
+            color: #fff;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 40px;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-text h2 {
+            font-size: 38px;
+            margin-bottom: 15px;
+            color: #111;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #d90429;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            border: 2px solid #333;
+            color: #333;
+        }
+
+        .hero-image {
+            width: 48%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Features Section */
+        .features-section {
+            background-color: #f8f9fa;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .features-section h2 {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .features-grid {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            flex: 1;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: #111;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Feedback Table Section */
+        .feedback-section {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feedback-section h2 {
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+
+        .satisfaction-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .satisfaction-table th {
+            background-color: #f1f3f5;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #ccc;
+        }
+
+        .satisfaction-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .satisfaction-table tbody tr:nth-child(even) {
+            background-color: #fdfdfd;
+        }
+
+        .rating {
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .rating-high {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .rating-low {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #111;
+            color: #fff;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 40px;
+        }
+
+        footer p {
+            font-size: 14px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>xyx gym</h1>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#feedback">Feedback</a></li>
+                <li><a href="login.html" class="login-btn">Login</a></li>
+                <li><a href="signup.html" class="cta-nav-btn">Get Started</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="home">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-text">
+                <h2>Transform Your Fitness Business</h2>
+                <p>
+                    Automate daily tasks, simplify class scheduling, track staff attendance,
+                    and process recurring payments effortlessly—all from a single, centralized system.
+                </p>
+                <div class="hero-buttons">
+                    <a href="signup.html" class="btn btn-primary">Start Free Trial</a>
+                    <a href="#services" class="btn btn-secondary">Explore Features</a>
+                </div>
+            </div>
+            <img src="gymmaster-dashboard-1-1.webp" alt="Gym Master Dashboard Preview" class="hero-image">
+        </section>
+
+        <section id="services" class="features-section">
+            <h2>Built to Scale Your Gym Operations</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Membership Management</h3>
+                    <p>Centralize member records, track active statuses, and automate package renewals with ease.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Class & Trainer Scheduling</h3>
+                    <p>Publish class timetables, assign trainers to sessions, and let members reserve spots instantly.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Automated Invoicing & Billing</h3>
+                    <p>Process recurring payment plans, issue digital receipts, and track overdue balances automatically.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Client Satisfaction Section -->
+        <section id="feedback" class="feedback-section">
+            <h2>Client Satisfaction & Feedback</h2>
+            
+            <table class="satisfaction-table">
+                <thead>
+                    <tr>
+                        <th>Member Name</th>
+                        <th>Assigned Trainer</th>
+                        <th>Rating</th>
+                        <th>Category</th>
+                        <th>Feedback / Comments</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Aman Sharma</td>
+                        <td>John Doe</td>
+                        <td><span class="rating rating-high">5 ★</span></td>
+                        <td>Facilities</td>
+                        <td>Equipment is well maintained and clean!</td>
+                        <td>18 Sep 2026</td>
+                    </tr>
+                    <tr>
+                        <td>Priya Patel</td>
+                        <td>Sarah Connor</td>
+                        <td><span class="rating rating-high">4 ★</span></td>
+                        <td>Trainer</td>
+                        <td>Great workout plan, seeing solid results.</td>
+                        <td>17 Sep 2026</td>
+                    </tr>
+                    <tr>
+                        <td>Rohan Verma</td>
+                        <td>Unassigned</td>
+                        <td><span class="rating rating-low">2 ★</span></td>
+                        <td>Locker Room</td>
+                        <td>Showers need better water pressure.</td>
+                        <td>15 Sep 2026</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 xyx gym Management System. Built by team Titan's.</p>
+    </footer>
+
+</body>
+</html>
