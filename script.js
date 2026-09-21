@@ -1,3 +1,15 @@
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Initialize Feedback Cards (Only runs on pages with #feedback-track)
+  loadFeedbackCards();
+
+  // 2. Initialize Login Form (Only runs on pages with #login-form)
+  initLoginForm();
+
+  // 3. Initialize Signup Form (Only runs on pages with #signup-form)
+  // initSignupForm();
+});
+
+
 async function loadFeedbackCards() {
   const track = document.querySelector('#feedback-track');
 
@@ -52,5 +64,36 @@ async function loadFeedbackCards() {
   }
 }
 
-// Automatically trigger fetch when page loads
-document.addEventListener('DOMContentLoaded', loadFeedbackCards);
+async function initLoginForm() {
+  //alert("initLoginForm is running");
+  const loginform = document.querySelector("#login-form")
+  if (!loginform) return;
+
+  loginform.addEventListener("submit",async (e)=>{
+    e.preventDefault();
+
+    const username = document.querySelector("#username").value;
+    const password = document.querySelector("#password").value;
+
+    console.log(username)
+    try {
+      const response = await fetch("/api/login",{
+        method : "POST",
+        headers : {"Content-Type": "application/json"},
+        body : JSON.stringify({username,password})
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message || "Login Successful!")
+      }
+      else {
+        alert(result.message || "Wrong")
+      }
+    }
+    catch (err) {
+      console.error("login request failed",err);
+      alert("unable to conect to server")
+    }
+  })
+}
