@@ -1,59 +1,42 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import json
+import os
 
 app = FastAPI(title="xyx gym Management API")
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 # ------------------------------------------------------------------
-# 1. DATA MODELS (FOR RECEIVING DATA FROM JS)
+# 1. DATA MODELS
 # ------------------------------------------------------------------
 class LoginData(BaseModel):
     username: str
     password: str
 
-
 # ------------------------------------------------------------------
-# 2. API ENDPOINTS
+# 2. API ENDPOINTS (Must be defined BEFORE the static mount below)
 # ------------------------------------------------------------------
-
-# GET Endpoint: Serves client feedback data to script.js for rotating cards
 @app.get("/api/feedback")
 def get_feedback():
-    with open("feedback.json","r",encoding="utf-8") as file:
-        content = json.load(file)
-    return content
+    feedback_path = os.path.join(BASE_DIR, "feedback.json")
+    if not os.path.exists(feedback_path):
+        return []
+    with open(feedback_path, "r", encoding="utf-8") as file:
+        return json.load(file)
 
-# POST Endpoint: Receives login details submitted from JavaScript
 @app.post("/api/login")
 def login(credentials: LoginData):
-    print(f"Received login attempt for user: {credentials.username}")
-
-    # Temporary hardcoded check (In the future, query PostgreSQL here!)
-    if credentials.username == "admin" and credentials.password == "gym123":
-        return {
-            "status": "success",
-            "message": "Login successful! Welcome to xyx gym.",
-        }
-    else:
-        raise HTTPException(
-            status_code=401, detail="Invalid username or password."
-        )
-
+    print(f"Received login attempt for user: {credentials.email}")
+    if credentials.email == "admin@123" and credentials.password == "gym123":
+        return {"status": "success", "message": "Login successful!"}
+    raise HTTPException(status_code=401, detail="Invalid username or password.")
 
 # ------------------------------------------------------------------
-# 3. HTML & STATIC FILES SERVING
+# 3. UNIVERSAL UI SERVING
 # ------------------------------------------------------------------
-
-#Serves your main HTML webpage at http://127.0.0.1:8000/
-@app.get("/", response_class=HTMLResponse)
-def read_root():
-    # REPLACE 'gym.html' WITH YOUR ACTUAL HTML FILENAME IF DIFFERENT
-    with open("index.html", "r", encoding="utf-8") as f:
-        return f.read()
-
-
-# Mounts directory so script.js, CSS, and images can be downloaded by Opera
-app.mount("/", StaticFiles(directory="."), name="static")
+# Mounts the static directory to the root. 
+# html=True automatically resolves "/" to index.html and "/login" to login.html
+app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")

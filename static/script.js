@@ -72,15 +72,15 @@ async function initLoginForm() {
   loginform.addEventListener("submit",async (e)=>{
     e.preventDefault();
 
-    const username = document.querySelector("#username").value;
+    const email = document.querySelector("#email").value;
     const password = document.querySelector("#password").value;
 
-    console.log(username)
+    console.log(email)
     try {
       const response = await fetch("/api/login",{
         method : "POST",
         headers : {"Content-Type": "application/json"},
-        body : JSON.stringify({username,password})
+        body : JSON.stringify({email,password})
       });
 
       const result = await response.json();

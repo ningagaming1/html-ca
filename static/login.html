@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Titans Fitness Studio</title>
+    <title>Welcome Back - Titans Fitness Studio</title>
     <style>
         :root {
             --slate: #8d99ae;
@@ -28,7 +28,7 @@
             overflow-x: hidden;
         }
 
-        /* Blurred gym background retaining authentic colors with subtle darkening gradient */
+        /* Blurred background keeping original colors with subtle darkening gradient */
         body::before {
             content: "";
             position: fixed;
@@ -40,8 +40,8 @@
             background-image: 
                 linear-gradient(
                     180deg,
-                    rgba(0, 0, 0, 0.35) 0%,
-                    rgba(0, 0, 0, 0.70) 100%
+                    rgba(0, 0, 0, 0.32) 0%,
+                    rgba(0, 0, 0, 0.65) 100%
                 ),
                 url("background.jpg"),
                 url("gym-bg.jpg"),
@@ -111,7 +111,7 @@
             transform: translateY(-1px);
         }
 
-        /* Main Container - Floating inputs, no solid card */
+        /* Main Container - No bounding box, floating elements */
         main {
             flex: 1;
             display: flex;
@@ -122,11 +122,11 @@
 
         .auth-container {
             width: 100%;
-            max-width: 320px;
+            max-width: 310px;
             text-align: center;
         }
 
-        /* Title & Subtitle */
+        /* Welcome Back Title */
         .auth-container h2 {
             font-size: 26px;
             font-weight: 800;
@@ -139,13 +139,13 @@
         .auth-container p.subtitle {
             color: rgba(237, 242, 244, 0.9);
             font-size: 12px;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
         }
 
-        /* Input Groups */
+        /* Floating Input Group */
         .input-group {
-            margin-bottom: 11px;
+            margin-bottom: 12px;
             text-align: left;
             position: relative;
         }
@@ -187,7 +187,7 @@
             font-size: 12px;
         }
 
-        /* Lift on hover & focus */
+        /* Lift effect on hover & focus */
         input[type="text"]:hover,
         input[type="email"]:hover,
         input[type="password"]:hover {
@@ -205,7 +205,21 @@
             box-shadow: 0 10px 22px rgba(239, 35, 60, 0.4);
         }
 
-        /* Floating Checkbox for Terms and Conditions */
+        /* Match warning */
+        .status-msg {
+            font-size: 11px;
+            margin-top: 3px;
+            margin-left: 12px;
+            display: none;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .status-msg.error {
+            display: block;
+            color: #ff6b81;
+        }
+
         .checkbox-group {
             display: flex;
             align-items: flex-start;
@@ -266,26 +280,10 @@
         .checkbox-group label a:hover {
             color: var(--light-bg);
         }
-
-        /* Match warning */
-        .status-msg {
-            font-size: 11px;
-            margin-top: 3px;
-            margin-left: 12px;
-            display: none;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-        }
-
-        .status-msg.error {
-            display: block;
-            color: #ff6b81;
-        }
-
         /* Floating Submit Button */
         .submit-btn {
             width: 100%;
-            margin-top: 4px;
+            margin-top: 8px;
             padding: 10px 18px;
             font-size: 13px;
             font-weight: 700;
@@ -309,7 +307,7 @@
             transform: translateY(0);
         }
 
-        /* Footer link to Login */
+        /* Footer link */
         .auth-footer {
             margin-top: 16px;
             font-size: 12px;
@@ -338,28 +336,28 @@
         <nav>
             <ul>
                 <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="login.html" class="nav-btn">Log In</a></li>
+                <li><a href="signup.html" class="nav-btn">Sign Up</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
         <div class="auth-container">
-            <h2>Join the Titans</h2>
-            <p class="subtitle">Start your fitness journey today</p>
+            <h2>Welcome Back</h2>
+            <p class="subtitle">Please enter your details to continue</p>
 
-            <form id="signup-form" onsubmit="return handleSignup(event)">
+            <form id="auth-form" onsubmit="return validateForm(event)">
                 <!-- Username -->
-                <div class="input-group">
+                <!-- <div class="input-group">
                     <label for="username">Username</label>
                     <input 
                         type="text" 
                         id="username" 
                         name="username" 
-                        placeholder="Choose a username" 
+                        placeholder="Enter username" 
                         required
                     >
-                </div>
+                </div> -->
 
                 <!-- Email -->
                 <div class="input-group">
@@ -368,7 +366,7 @@
                         type="email" 
                         id="email" 
                         name="email" 
-                        placeholder="Enter your email" 
+                        placeholder="Enter email address" 
                         required
                     >
                 </div>
@@ -380,23 +378,23 @@
                         type="password" 
                         id="password" 
                         name="password" 
-                        placeholder="Create a password" 
+                        placeholder="Enter password" 
                         required
                     >
                 </div>
 
                 <!-- Confirm Password -->
-                <div class="input-group">
+                <!-- <div class="input-group">
                     <label for="confirm-password">Confirm Password</label>
                     <input 
                         type="password" 
                         id="confirm-password" 
                         name="confirm_password" 
-                        placeholder="Confirm your password" 
+                        placeholder="Re-enter password" 
                         required
                     >
                     <span id="password-match-error" class="status-msg error">Passwords do not match</span>
-                </div>
+                </div> -->
 
                 <!-- Terms and Conditions Checkbox -->
                 <div class="checkbox-group">
@@ -406,51 +404,16 @@
                     </label>
                 </div>
 
-                <button type="submit" class="submit-btn">Create Account</button>
+                <button type="submit" class="submit-btn">Continue</button>
 
                 <div class="auth-footer">
-                    <span>Already a member?</span>
-                    <a href="login.html">Log In</a>
+                    <span>Don't have an account?</span>
+                    <a href="signup.html">Sign Up</a>
                 </div>
             </form>
         </div>
     </main>
 
-    <script>
-        function handleSignup(e) {
-            e.preventDefault();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const terms = document.getElementById('terms').checked;
-            const errorMsg = document.getElementById('password-match-error');
-
-            if (password !== confirmPassword) {
-                errorMsg.style.display = 'block';
-                document.getElementById('confirm-password').focus();
-                return false;
-            }
-
-            if (!terms) {
-                alert('Please accept the Terms and Conditions to proceed.');
-                return false;
-            }
-
-            errorMsg.style.display = 'none';
-            alert('Welcome to Titans Fitness Studio! Your account has been created.');
-            window.location.href = 'ca.login.html';
-            return true;
-        }
-
-        // Real-time password match feedback
-        document.getElementById('confirm-password').addEventListener('input', function() {
-            const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('password-match-error');
-            if (this.value && this.value !== password) {
-                errorMsg.style.display = 'block';
-            } else {
-                errorMsg.style.display = 'none';
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
