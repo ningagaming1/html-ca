@@ -3,199 +3,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
+    <title>Sign Up - Titans Fitness Studio</title>
     <style>
+        :root {
+            --slate: #8d99ae;
+            --light-bg: #edf2f4;
+            --red-accent: #ef233c;
+            --crimson: #d80032;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
         }
 
         body {
-            color: #333;
-            line-height: 1.6;
-            background-color: #111;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--light-bg);
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* Header & Navigation */
+        /* Blurred gym background retaining authentic colors with subtle darkening gradient */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            z-index: -1;
+            background-image: 
+                linear-gradient(
+                    180deg,
+                    rgba(0, 0, 0, 0.35) 0%,
+                    rgba(0, 0, 0, 0.70) 100%
+                ),
+                url("background.jpg"),
+                url("gym-bg.jpg"),
+                url("file:///C:/Users/HP/.gemini/antigravity/brain/d28b3168-3688-44e8-a6a2-6181c304c205/.user_uploaded/media_1790847620150.jpg");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            filter: blur(5px);
+            transform: scale(1.04);
+        }
+
+        /* Glass Header */
         header {
-            background-color: #ffffff;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 40px;
-            border-bottom: 2px solid #e0e0e0;
-            height: 70px;
-            position: relative;
-            z-index: 10;
+            padding: 14px 28px;
+            background: rgba(17, 21, 28, 0.45);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(237, 242, 244, 0.12);
         }
 
         header h1 {
-            font-size: 24px;
-            color: #111;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--light-bg);
+        }
+
+        header h1 span {
+            color: var(--red-accent);
         }
 
         nav ul {
             display: flex;
-            gap: 25px;
+            gap: 16px;
             list-style: none;
             align-items: center;
         }
 
-        nav a {
+        .nav-link {
             text-decoration: none;
-            font-weight: 500;
+            color: var(--light-bg);
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.2s ease;
         }
 
-        .cta-nav-btn {
-            background-color: #d90429;
-            color: #fff;
-            padding: 8px 18px;
-            border-radius: 6px;
-            border: 3px solid #d90429;
-            transition: background-color 0.2s ease;
+        .nav-link:hover {
+            color: var(--red-accent);
         }
 
-        .cta-nav-btn:hover {
-            background-color: #b10320;
-            border-color: #b10320;
-            color: #fff;
+        .nav-btn {
+            background-color: var(--crimson);
+            color: var(--light-bg);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 12px;
+            padding: 6px 16px;
+            border-radius: 18px;
+            transition: all 0.25s ease;
         }
 
-        /* Main Container with Background Image */
+        .nav-btn:hover {
+            background-color: var(--red-accent);
+            transform: translateY(-1px);
+        }
+
+        /* Main Container - Floating inputs, no solid card */
         main {
+            flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: calc(100vh - 70px); 
-            padding: 20px;
-
-            /* Dark overlay + Your Gym Background Image */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("loginbackground.webp");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            padding: 24px 16px;
         }
-        
-        /* Modern Dark Glassmorphism Card */
-        form {
+
+        .auth-container {
             width: 100%;
-            max-width: 380px;
-            /* Semi-transparent dark background with subtle blur */
-            background: rgba(18, 18, 18, 0.85);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            padding: 35px 30px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            color: #ffffff;
+            max-width: 320px;
+            text-align: center;
         }
 
-        form h2 {
-            text-align: center;
-            margin-bottom: 24px;
-            color: #ffffff;
+        /* Title & Subtitle */
+        .auth-container h2 {
             font-size: 26px;
+            font-weight: 800;
+            color: var(--light-bg);
+            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.65);
+            margin-bottom: 4px;
             letter-spacing: 0.5px;
         }
 
+        .auth-container p.subtitle {
+            color: rgba(237, 242, 244, 0.9);
+            font-size: 12px;
+            margin-bottom: 18px;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Input Groups */
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 11px;
+            text-align: left;
+            position: relative;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #e0e0e0;
+            margin-bottom: 4px;
+            margin-left: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--light-bg);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
         }
 
-        /* Metallic Gray Input Styling matching Chrome Dumbbells */
+        /* Floating Inputs */
         input[type="text"],
+        input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 12px;
-            background-color: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            font-size: 15px;
-            color: #ffffff;
+            padding: 9px 16px;
+            font-size: 13px;
+            color: #111827;
+            background: rgba(237, 242, 244, 0.94);
+            border: 1.5px solid transparent;
+            border-radius: 20px;
             outline: none;
-            transition: all 0.2s ease;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
         input[type="password"]::placeholder {
-            color: #888;
+            color: var(--slate);
+            font-size: 12px;
         }
 
-        /* Focus State with Red Accent Border */
+        /* Lift on hover & focus */
+        input[type="text"]:hover,
+        input[type="email"]:hover,
+        input[type="password"]:hover {
+            background: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.38);
+        }
+
         input[type="text"]:focus,
+        input[type="email"]:focus,
         input[type="password"]:focus {
-            border-color: #d90429;
-            background-color: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 8px rgba(217, 4, 41, 0.4);
+            background: #ffffff;
+            border-color: var(--red-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(239, 35, 60, 0.4);
         }
 
-        /* Red Accent Submit Button */
+        /* Floating Checkbox for Terms and Conditions */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 14px 4px 14px 6px;
+            text-align: left;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            min-width: 16px;
+            margin-top: 2px;
+            border-radius: 4px;
+            background-color: rgba(237, 242, 244, 0.92);
+            border: 1.5px solid var(--slate);
+            cursor: pointer;
+            outline: none;
+            display: grid;
+            place-content: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked {
+            background-color: var(--crimson);
+            border-color: var(--red-accent);
+        }
+
+        .checkbox-group input[type="checkbox"]:checked::before {
+            content: "✓";
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .checkbox-group label {
+            display: inline;
+            margin: 0;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: normal;
+            line-height: 1.4;
+            color: var(--light-bg);
+            cursor: pointer;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+        }
+
+        .checkbox-group label a {
+            color: #ff758f;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+
+        .checkbox-group label a:hover {
+            color: var(--light-bg);
+        }
+
+        /* Match warning */
+        .status-msg {
+            font-size: 11px;
+            margin-top: 3px;
+            margin-left: 12px;
+            display: none;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .status-msg.error {
+            display: block;
+            color: #ff6b81;
+        }
+
+        /* Floating Submit Button */
         .submit-btn {
             width: 100%;
-            background-color: #d90429;
-            color: #ffffff;
-            padding: 12px;
+            margin-top: 4px;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--light-bg);
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
             border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: bold;
+            border-radius: 22px;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 8px 18px rgba(216, 0, 50, 0.45);
+            transition: all 0.25s ease;
         }
 
         .submit-btn:hover {
-            background-color: #b10320;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(216, 0, 50, 0.55);
+            background: linear-gradient(135deg, #ff3b53, var(--crimson));
         }
 
         .submit-btn:active {
-            transform: scale(0.98);
+            transform: translateY(0);
         }
 
+        /* Footer link to Login */
+        .auth-footer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: var(--light-bg);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-footer a {
+            color: #ff758f;
+            text-decoration: none;
+            font-weight: 700;
+            margin-left: 4px;
+            transition: color 0.2s ease;
+        }
+
+        .auth-footer a:hover {
+            color: var(--light-bg);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>xyz gym</h1>
+        <h1>Titans <span>Fitness Studio</span></h1>
         <nav>
             <ul>
-                <li><a href="index.html" class="cta-nav-btn">Home</a></li>
-                <li><a href="login.html" class="cta-nav-btn">login</a></li>
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="login.html" class="nav-btn">Log In</a></li>
             </ul>
         </nav>
     </header>
 
     <main>
-        <form id="login-form">
-            <h2>Member Signup</h2>
-            
-            <div class="input-group">
-                <label for="username">User ID / Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your ID" required>
-            </div>
+        <div class="auth-container">
+            <h2>Join the Titans</h2>
+            <p class="subtitle">Start your fitness journey today</p>
 
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter password" required>
-            </div>
+            <form id="signup-form" onsubmit="return handleSignup(event)">
+                <!-- Username -->
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Choose a username" 
+                        required
+                    >
+                </div>
 
-            <button type="submit" class="submit-btn">Log In</button>
-        </form>
+                <!-- Email -->
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="Enter your email" 
+                        required
+                    >
+                </div>
+
+                <!-- Password -->
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Create a password" 
+                        required
+                    >
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="input-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        id="confirm-password" 
+                        name="confirm_password" 
+                        placeholder="Confirm your password" 
+                        required
+                    >
+                    <span id="password-match-error" class="status-msg error">Passwords do not match</span>
+                </div>
+
+                <!-- Terms and Conditions Checkbox -->
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#">Terms and Conditions</a> & <a href="#">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <button type="submit" class="submit-btn">Create Account</button>
+
+                <div class="auth-footer">
+                    <span>Already a member?</span>
+                    <a href="login.html">Log In</a>
+                </div>
+            </form>
+        </div>
     </main>
 
-    <script src="script.js"></script>
-    </main>
+    <script>
+        function handleSignup(e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const terms = document.getElementById('terms').checked;
+            const errorMsg = document.getElementById('password-match-error');
+
+            if (password !== confirmPassword) {
+                errorMsg.style.display = 'block';
+                document.getElementById('confirm-password').focus();
+                return false;
+            }
+
+            if (!terms) {
+                alert('Please accept the Terms and Conditions to proceed.');
+                return false;
+            }
+
+            errorMsg.style.display = 'none';
+            alert('Welcome to Titans Fitness Studio! Your account has been created.');
+            window.location.href = 'ca.login.html';
+            return true;
+        }
+
+        // Real-time password match feedback
+        document.getElementById('confirm-password').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('password-match-error');
+            if (this.value && this.value !== password) {
+                errorMsg.style.display = 'block';
+            } else {
+                errorMsg.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
