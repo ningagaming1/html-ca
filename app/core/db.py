@@ -26,9 +26,6 @@ class UserDatabase:
             is_locked BOOLEAN DEFAULT 0,
             budget TEXT DEFAULT '{}',
             tasks TEXT DEFAULT '[]',
-            contacts TEXT DEFAULT '[]',
-            grades TEXT DEFAULT '[]',
-            journal TEXT DEFAULT '[]'
         );
         """
         with self._get_connection() as conn:
@@ -56,7 +53,7 @@ class UserDatabase:
                 conn.commit()
             return True
         except sqlite3.IntegrityError:
-            print(f"User '{username}' already exists. ❌")
+            print(f"User '{username}' already exists.")
             return False
 
     def remove_user(self, username):
@@ -79,11 +76,7 @@ class UserDatabase:
                 "username": user["username"],
                 "password": user["password"],
                 "is_locked": bool(user["is_locked"]),
-                "budget": json.loads(user["budget"]),
-                "tasks": json.loads(user["tasks"]),
-                "contacts": json.loads(user["contacts"]),
-                "grades": json.loads(user["grades"]),
-                "journal": json.loads(user["journal"])
+                "budget": json.loads(user["budget"])
             }
         return None
 
