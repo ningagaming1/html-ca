@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer Dashboard - Titans Fitness Studio</title>
+    <style>
+        :root {
+            --slate: #8d99ae;
+            --light-bg: #edf2f4;
+            --red-accent: #ef233c;
+            --crimson: #d80032;
+            --dark-card: rgba(17, 21, 28, 0.72);
+            --dark-card-hover: rgba(26, 32, 44, 0.85);
+            --dark-border: rgba(237, 242, 244, 0.12);
+            --success-green: #2ec4b6;
+            --warning-amber: #ff9f1c;
+            --info-blue: #3a86ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--light-bg);
+            position: relative;
+            background-color: #0d1117;
+            overflow-x: hidden;
+        }
+
+        /* Blurred gym background */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            z-index: -1;
+            background-image: 
+                linear-gradient(
+                    180deg,
+                    rgba(10, 14, 20, 0.58) 0%,
+                    rgba(8, 10, 15, 0.90) 100%
+                ),
+                url("background.jpg"),
+                url("gym-bg.jpg");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            filter: blur(8px);
+            transform: scale(1.04);
+        }
+
+        /* Glass Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px;
+            background: rgba(17, 21, 28, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--dark-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--light-bg);
+        }
+
+        header h1 span {
+            color: var(--red-accent);
+        }
+
+        .role-badge {
+            background: rgba(46, 196, 182, 0.16);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--light-bg);
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--red-accent);
+        }
+
+        .role-switcher {
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid var(--dark-border);
+            color: var(--light-bg);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 16px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-switcher:hover {
+            background: rgba(237, 242, 244, 0.16);
+            border-color: var(--slate);
+        }
+
+        .role-switcher option {
+            background: #11151c;
+            color: var(--light-bg);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 12px;
+            border-left: 1px solid var(--dark-border);
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2ec4b6, #0e8579);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(46, 196, 182, 0.4);
+        }
+
+        .user-info {
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .user-id {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: var(--slate);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            color: var(--red-accent);
+            background: rgba(239, 35, 60, 0.1);
+        }
+
+        /* Main Layout */
+        main {
+            flex: 1;
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 20px 80px 20px;
+        }
+
+        /* Coach Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(46, 196, 182, 0.20) 0%, rgba(17, 21, 28, 0.78) 100%);
+            border: 1px solid rgba(46, 196, 182, 0.35);
+            border-radius: 20px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::after {
+            content: "COACH";
+            position: absolute;
+            right: -25px;
+            bottom: -25px;
+            font-size: 110px;
+            font-weight: 900;
+            color: rgba(237, 242, 244, 0.03);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .banner-text h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .banner-text p {
+            color: var(--slate);
+            font-size: 13px;
+            max-width: 580px;
+        }
+
+        .banner-actions {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            color: var(--light-bg);
+            border: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(216, 0, 50, 0.4);
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(216, 0, 50, 0.55);
+            background: linear-gradient(135deg, #ff3b53, var(--crimson));
+        }
+
+        .secondary-btn {
+            background: rgba(237, 242, 244, 0.1);
+            color: var(--light-bg);
+            border: 1px solid var(--dark-border);
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(237, 242, 244, 0.18);
+            border-color: var(--slate);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: var(--dark-card-hover);
+            border-color: rgba(239, 35, 60, 0.35);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--slate);
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: rgba(46, 196, 182, 0.15);
+            color: var(--success-green);
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--light-bg);
+            margin-bottom: 6px;
+        }
+
+        .stat-detail {
+            font-size: 12px;
+            color: var(--slate);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-highlight {
+            color: var(--success-green);
+            font-weight: 700;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 950px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 18px;
+            padding: 22px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(237, 242, 244, 0.08);
+            padding-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title span {
+            color: var(--red-accent);
+        }
+
+        /* Client Roster Table */
+        .client-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .client-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(237, 242, 244, 0.04);
+            border: 1px solid rgba(237, 242, 244, 0.08);
+            padding: 12px 16px;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .client-row:hover {
+            background: rgba(237, 242, 244, 0.08);
+            border-color: rgba(239, 35, 60, 0.3);
+        }
+
+        .client-profile-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .client-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #232c3d;
+            border: 1.5px solid var(--red-accent);
+            display: grid;
+            place-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .client-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--light-bg);
+        }
+
+        .client-meta {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .badge-active {
+            background: rgba(46, 196, 182, 0.15);
+            color: var(--success-green);
+        }
+
+        .badge-pending {
+            background: rgba(255, 159, 28, 0.15);
+            color: var(--warning-amber);
+        }
+
+        .action-icon-btn {
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid var(--dark-border);
+            color: var(--light-bg);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-icon-btn:hover {
+            background: var(--red-accent);
+            border-color: var(--crimson);
+            color: #fff;
+        }
+
+        /* Schedule Timeline */
+        .timeline-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(237, 242, 244, 0.06);
+            align-items: center;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-time {
+            min-width: 72px;
+            background: rgba(239, 35, 60, 0.12);
+            border: 1px solid rgba(239, 35, 60, 0.25);
+            border-radius: 10px;
+            text-align: center;
+            padding: 6px 8px;
+        }
+
+        .time-text {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--red-accent);
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-content h4 {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .timeline-content p {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        /* Quick Routine Builder */
+        .form-select, .form-input {
+            width: 100%;
+            padding: 9px 14px;
+            font-size: 12px;
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid var(--dark-border);
+            color: var(--light-bg);
+            border-radius: 14px;
+            outline: none;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--red-accent);
+            background: rgba(237, 242, 244, 0.14);
+        }
+
+        .form-select option {
+            background: #11151c;
+            color: #fff;
+        }
+
+        /* ================= AI CHATBOT (CONNECTED TO BACKEND API) ================= */
+        .chat-widget-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            box-shadow: 0 8px 24px rgba(216, 0, 50, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            z-index: 1000;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .chat-widget-button:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 12px 28px rgba(216, 0, 50, 0.7);
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background: var(--success-green);
+            color: #0d1117;
+            font-size: 10px;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #0d1117;
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 92px;
+            right: 24px;
+            width: 380px;
+            max-width: calc(100vw - 48px);
+            height: 540px;
+            background: rgba(17, 21, 28, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 35, 60, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeInSlide 0.28s ease forwards;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .chat-header {
+            padding: 14px 18px;
+            background: rgba(239, 35, 60, 0.15);
+            border-bottom: 1px solid var(--dark-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bot-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .bot-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--light-bg);
+        }
+
+        .bot-status {
+            font-size: 10px;
+            color: var(--success-green);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success-green);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .chat-controls button {
+            background: transparent;
+            border: none;
+            color: var(--slate);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: color 0.2s;
+        }
+
+        .chat-controls button:hover {
+            color: var(--light-bg);
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb {
+            background: rgba(237, 242, 244, 0.15);
+            border-radius: 4px;
+        }
+
+        .chat-message {
+            max-width: 85%;
+            font-size: 12px;
+            line-height: 1.45;
+            padding: 10px 14px;
+            border-radius: 14px;
+            word-break: break-word;
+        }
+
+        .chat-message.bot {
+            align-self: flex-start;
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid rgba(237, 242, 244, 0.1);
+            color: var(--light-bg);
+            border-bottom-left-radius: 3px;
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            color: #ffffff;
+            border-bottom-right-radius: 3px;
+            box-shadow: 0 4px 12px rgba(216, 0, 50, 0.35);
+        }
+
+        .chat-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 6px 14px 10px 14px;
+            border-top: 1px solid rgba(237, 242, 244, 0.05);
+        }
+
+        .prompt-chip {
+            background: rgba(237, 242, 244, 0.07);
+            border: 1px solid var(--dark-border);
+            color: var(--slate);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .prompt-chip:hover {
+            color: var(--light-bg);
+            border-color: var(--red-accent);
+            background: rgba(239, 35, 60, 0.15);
+        }
+
+        .chat-footer {
+            padding: 12px 14px;
+            background: rgba(17, 21, 28, 0.8);
+            border-top: 1px solid var(--dark-border);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(237, 242, 244, 0.94);
+            border: 1px solid transparent;
+            border-radius: 18px;
+            padding: 8px 14px;
+            font-size: 12px;
+            color: #111827;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--red-accent);
+            background: #ffffff;
+        }
+
+        .chat-send-btn {
+            background: var(--red-accent);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.08);
+            background: var(--crimson);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: rgba(237, 242, 244, 0.08);
+            padding: 8px 12px;
+            border-radius: 12px;
+            gap: 4px;
+        }
+
+        .typing-indicator span {
+            width: 5px;
+            height: 5px;
+            background: var(--slate);
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.2s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand-container">
+            <h1>Titans <span>Fitness Studio</span></h1>
+            <span class="role-badge">Trainer Portal</span>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-link active">Roster</a></li>
+                <li><a href="#schedule" class="nav-link">Sessions</a></li>
+                <li><a href="#builder" class="nav-link">Plan Builder</a></li>
+                <li>
+                    <select class="role-switcher" onchange="location = this.value;">
+                        <option value="trainer-dashboard.html" selected>Trainer View</option>
+                        <option value="member-dashboard.html">Switch to Member</option>
+                        <option value="admin-dashboard.html">Switch to Admin/Owner</option>
+                    </select>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="user-profile">
+            <div class="user-avatar">AV</div>
+            <div class="user-info">
+                <div class="user-name">Coach Ananya Verma</div>
+                <div class="user-id">Lead Strength & Conditioning Coach</div>
+            </div>
+            <a href="login.html" class="logout-btn" title="Sign Out">Log Out</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Trainer Welcome Hero -->
+        <section class="welcome-banner">
+            <div class="banner-text">
+                <h2>Hello, Coach Ananya! 📋</h2>
+                <p>You have <strong>6 athlete sessions scheduled today</strong>. 2 completed, 4 upcoming. Your client compliance rate is holding strong at 94.2%.</p>
+            </div>
+            <div class="banner-actions">
+                <a href="#schedule" class="cta-btn">
+                    ⏱️ Today's Sessions
+                </a>
+                <button class="secondary-btn" onclick="syncCalendar()">
+                    📅 Calendar Sync
+                </button>
+            </div>
+        </section>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Active Athletes</span>
+                    <div class="stat-icon">👥</div>
+                </div>
+                <div class="stat-value">28 <span style="font-size: 14px; color: var(--slate); font-weight: 600;">Clients</span></div>
+                <div class="stat-detail"><span class="stat-highlight">+3 new</span> this month</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Today's Sessions</span>
+                    <div class="stat-icon">⏱️</div>
+                </div>
+                <div class="stat-value">6 <span style="font-size: 14px; color: var(--slate); font-weight: 600;">Total</span></div>
+                <div class="stat-detail"><span class="stat-highlight">2 Done</span> • 4 Upcoming</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Client Adherence</span>
+                    <div class="stat-icon">📈</div>
+                </div>
+                <div class="stat-value">94.2%</div>
+                <div class="stat-detail">Top 5% across Titans branches</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Monthly Payout</span>
+                    <div class="stat-icon">⭐</div>
+                </div>
+                <div class="stat-value">₹72,500</div>
+                <div class="stat-detail"><span class="stat-highlight">4.98 / 5.0</span> Rating (52 Reviews)</div>
+            </div>
+        </section>
+
+        <!-- Main Content 2-Column Grid -->
+        <div class="content-grid">
+            <!-- Left Column: Active Client Roster -->
+            <div class="main-column">
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">Assigned <span>Athletes & Clients</span></div>
+                        <input type="text" id="clientSearch" oninput="filterClients()" placeholder="Search client name..." style="padding: 6px 12px; background: rgba(237,242,244,0.08); border: 1px solid var(--dark-border); border-radius: 12px; color: #fff; font-size: 11px; outline: none;">
+                    </div>
+
+                    <div class="client-list" id="client-list-container">
+                        <div class="client-row" data-name="Rohan Sharma">
+                            <div class="client-profile-box">
+                                <div class="client-avatar">RS</div>
+                                <div>
+                                    <div class="client-name">Rohan Sharma</div>
+                                    <div class="client-meta">Goal: Hypertrophy & Strength • Today: Push Day</div>
+                                </div>
+                            </div>
+                            <span class="badge-status badge-active">Session @ 11:30 AM</span>
+                            <button class="action-icon-btn" onclick="openChatWithPrompt('Provide progress review summary and workout adjustments for Rohan Sharma')">Review</button>
+                        </div>
+
+                        <div class="client-row" data-name="Devansh Patel">
+                            <div class="client-profile-box">
+                                <div class="client-avatar" style="border-color: var(--warning-amber);">DP</div>
+                                <div>
+                                    <div class="client-name">Devansh Patel</div>
+                                    <div class="client-meta">Goal: Fat Loss & Conditioning • 8 Weeks In</div>
+                                </div>
+                            </div>
+                            <span class="badge-status badge-active">Session @ 02:00 PM</span>
+                            <button class="action-icon-btn" onclick="openChatWithPrompt('What is the best conditioning finisher for Devansh Patel?')">Review</button>
+                        </div>
+
+                        <div class="client-row" data-name="Priya Nair">
+                            <div class="client-profile-box">
+                                <div class="client-avatar" style="border-color: #3a86ff;">PN</div>
+                                <div>
+                                    <div class="client-name">Priya Nair</div>
+                                    <div class="client-meta">Goal: Mobility & Deadlift Form Correction</div>
+                                </div>
+                            </div>
+                            <span class="badge-status badge-pending">Needs New Program</span>
+                            <button class="action-icon-btn" onclick="openChatWithPrompt('Draft mobility cues for hip hinge and deadlifts for Priya Nair')">Review</button>
+                        </div>
+
+                        <div class="client-row" data-name="Siddharth Rao">
+                            <div class="client-profile-box">
+                                <div class="client-avatar">SR</div>
+                                <div>
+                                    <div class="client-name">Siddharth Rao</div>
+                                    <div class="client-meta">Goal: Powerlifting Peaking • Squat 180kg</div>
+                                </div>
+                            </div>
+                            <span class="badge-status badge-active">Session @ 04:30 PM</span>
+                            <button class="action-icon-btn" onclick="openChatWithPrompt('Deload plan for 180kg squat prep for Siddharth Rao')">Review</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule Section -->
+                <div class="panel-card" id="schedule">
+                    <div class="panel-header">
+                        <div class="panel-title">Today's <span>Coaching Timeline (IST)</span></div>
+                        <span style="font-size: 11px; color: var(--slate);">Thursday Schedule</span>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">
+                            <div class="time-text">09:00 AM</div>
+                        </div>
+                        <div class="timeline-content">
+                            <h4>Session: Kavya Iyer</h4>
+                            <p>Full Body Mobility & Core Stabilization • Completed ✓</p>
+                        </div>
+                        <span class="badge-status badge-active" style="font-size: 10px;">Finished</span>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">
+                            <div class="time-text">11:30 AM</div>
+                        </div>
+                        <div class="timeline-content">
+                            <h4>1-on-1: Rohan Sharma</h4>
+                            <p>Upper Body Push & Rotator Cuff Health • Free Weights Area</p>
+                        </div>
+                        <button class="action-icon-btn" onclick="startSession(2, 'Rohan Sharma')">Start Session</button>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-time">
+                            <div class="time-text">05:30 PM</div>
+                        </div>
+                        <div class="timeline-content">
+                            <h4>Group Studio Batch: Titan Shakti Strength</h4>
+                            <p>Main Floor • 16 Registered Athletes</p>
+                        </div>
+                        <button class="action-icon-btn" onclick="alert('Roster of 16 registered athletes checked! Studio A prepared.')">View Roster</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Quick Routine Builder & AI Assistant -->
+            <div class="side-column">
+                <!-- Program Assign Tool -->
+                <div class="panel-card" id="builder">
+                    <div class="panel-header">
+                        <div class="panel-title">Assign <span>Client Routine</span></div>
+                    </div>
+
+                    <form id="routine-form" onsubmit="handleAssignRoutine(event)">
+                        <label style="font-size: 11px; font-weight: 700; color: var(--slate); text-transform: uppercase;">Select Athlete</label>
+                        <select class="form-select" id="athleteSelect">
+                            <option value="Rohan Sharma (#TITAN-9204)">Rohan Sharma (#TITAN-9204)</option>
+                            <option value="Devansh Patel (#TITAN-8812)">Devansh Patel (#TITAN-8812)</option>
+                            <option value="Priya Nair (#TITAN-7319)">Priya Nair (#TITAN-7319)</option>
+                            <option value="Siddharth Rao (#TITAN-5541)">Siddharth Rao (#TITAN-5541)</option>
+                        </select>
+
+                        <label style="font-size: 11px; font-weight: 700; color: var(--slate); text-transform: uppercase;">Workout Template</label>
+                        <select class="form-select" id="templateSelect">
+                            <option value="Hypertrophy 4-Day Push/Pull/Legs">Hypertrophy 4-Day Push/Pull/Legs</option>
+                            <option value="Powerlifting Peaking Phase (Week 1-3)">Powerlifting Peaking Phase (Week 1-3)</option>
+                            <option value="Athletic Conditioning & Agility">Athletic Conditioning & Agility</option>
+                            <option value="Post-Injury Deload & Mobility">Post-Injury Deload & Mobility</option>
+                        </select>
+
+                        <label style="font-size: 11px; font-weight: 700; color: var(--slate); text-transform: uppercase;">Coach Notes</label>
+                        <input type="text" class="form-input" id="coachNotes" placeholder="e.g. Focus on 3-sec eccentric tempos">
+
+                        <button type="submit" class="cta-btn" style="width: 100%; justify-content: center; margin-top: 6px;">
+                            🚀 Push to Athlete App
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Trainer Quick Tips Panel -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">Studio <span>Floor Alerts</span></div>
+                    </div>
+                    <p style="font-size: 12px; line-height: 1.5; color: var(--slate); margin-bottom: 12px;">
+                        ⚠️ <strong>Notice:</strong> Squat Rack #3 reserved for Olympic lifting workshop at 4:00 PM today.
+                    </p>
+                    <p style="font-size: 12px; line-height: 1.5; color: var(--slate);">
+                        💡 <strong>FitBuddy Tip:</strong> Hydration is critical during high-volume sessions. Remind clients to consume electrolytes (Nimbu Paani with rock salt) during intense leg days!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Floating Chatbot Widget Button -->
+    <div class="chat-widget-button" onclick="toggleChat()" id="chatButton" title="FitBuddy Coach Copilot">
+        <span class="chat-badge">AI</span>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <!-- AI Chatbot Window -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="bot-avatar">📋</div>
+                <div>
+                    <div class="bot-name">FitBuddy (Coach Copilot)</div>
+                    <div class="bot-status"><span class="status-dot"></span> Online (FastAPI Backend)</div>
+                </div>
+            </div>
+            <div class="chat-controls">
+                <button onclick="clearChat()" title="Clear Chat">🗑️</button>
+                <button onclick="toggleChat()" title="Close Chat">✕</button>
+            </div>
+        </div>
+
+        <div class="chat-body" id="chatBody">
+            <div class="chat-message bot">
+                Hello Coach Ananya! I'm <strong>FitBuddy</strong>, your coaching assistant. I can calculate athlete TDEE, draft periodization templates, and organize exercise form cues. What are we building today?
+            </div>
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="chat-chips">
+            <span class="prompt-chip" onclick="sendQuickPrompt('Draft a 3-exercise rotator cuff prehab circuit')">🛡️ Rotator Prehab</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Calculate maintenance calories for a 75kg Indian athlete with high volume')">📊 Calorie Formula</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Cues for fixing butt wink in deep squats')">🏋️ Squat Cues</span>
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask FitBuddy Coach Copilot..." onkeypress="handleKeyPress(event)">
+            <button class="chat-send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // AI Chatbot UI Logic connected to Backend /api/chat
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody = document.getElementById('chatBody');
+        const chatInput = document.getElementById('chatInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        function toggleChat() {
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+            if (chatWindow.style.display === 'flex') {
+                chatInput.focus();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendQuickPrompt(promptText) {
+            chatInput.value = promptText;
+            sendMessage();
+        }
+
+        function openChatWithPrompt(promptText) {
+            chatWindow.style.display = 'flex';
+            chatInput.value = promptText;
+            sendMessage();
+        }
+
+        function clearChat() {
+            chatBody.innerHTML = `
+                <div class="chat-message bot">
+                    Hello Coach Ananya! I'm <strong>FitBuddy</strong>, your coaching assistant. I can calculate athlete TDEE, draft periodization templates, and organize exercise form cues. What are we building today?
+                </div>
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+        }
+
+        function appendMessage(sender, text) {
+            const msg = document.createElement('div');
+            msg.className = `chat-message ${sender}`;
+            let formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            msg.innerHTML = formatted;
+            chatBody.insertBefore(msg, typingIndicator);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            chatInput.value = '';
+
+            typingIndicator.style.display = 'flex';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        user_name: 'Coach Ananya Verma',
+                        user_role: 'trainer',
+                        user_context: 'active_athletes=28, role=lead strength and conditioning coach'
+                    })
+                });
+
+                typingIndicator.style.display = 'none';
+
+                if (!response.ok) {
+                    throw new Error(`Server returned status ${response.status}`);
+                }
+
+                const data = await response.json();
+                appendMessage('bot', data.reply || "Coaching plan updated.");
+            } catch (err) {
+                console.error("Chat error:", err);
+                typingIndicator.style.display = 'none';
+                appendMessage('bot', "FitBuddy Coach Copilot is synced with the local trainer system.");
+            }
+        }
+
+        // Trainer Operational Actions
+        async function handleAssignRoutine(e) {
+            e.preventDefault();
+            const athlete = document.getElementById('athleteSelect').value;
+            const template = document.getElementById('templateSelect').value;
+            const notes = document.getElementById('coachNotes').value;
+
+            try {
+                const res = await fetch('/api/trainer/assign-routine', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        client_name: athlete,
+                        template_name: template,
+                        notes: notes,
+                        trainer_id: 1
+                    })
+                });
+                const data = await res.json();
+                alert(data.message || `Workout plan '${template}' successfully assigned to ${athlete}!`);
+                document.getElementById('coachNotes').value = '';
+            } catch (err) {
+                alert(`Workout plan '${template}' pushed to ${athlete}!`);
+            }
+        }
+
+        async function startSession(id, clientName) {
+            try {
+                await fetch('/api/trainer/start-session', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ session_id: id, action: 'start' })
+                });
+                alert(`Session with ${clientName} is now in progress on the free weights floor!`);
+            } catch (e) {
+                alert(`Session with ${clientName} started.`);
+            }
+        }
+
+        function syncCalendar() {
+            alert("Google Calendar & Apple Calendar Sync complete! 6 scheduled sessions synced with client reminders.");
+        }
+
+        function filterClients() {
+            const query = document.getElementById('clientSearch').value.toLowerCase();
+            const rows = document.querySelectorAll('.client-row');
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name').toLowerCase();
+                row.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>

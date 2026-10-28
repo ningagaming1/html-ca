@@ -417,8 +417,10 @@
     </main>
 
     <script>
-        function handleSignup(e) {
+        async function handleSignup(e) {
             e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             const terms = document.getElementById('terms').checked;
@@ -436,9 +438,33 @@
             }
 
             errorMsg.style.display = 'none';
-            alert('Welcome to Titans Fitness Studio! Your account has been created.');
-            window.location.href = 'ca.login.html';
-            return true;
+
+            try {
+                const res = await fetch("/api/signup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        role: "member"
+                    })
+                });
+
+                const data = await res.json();
+                if (res.ok) {
+                    alert("Welcome to Titans Fitness Studio! Your account has been created.");
+                    window.location.href = 'login.html';
+                    return true;
+                } else {
+                    alert(data.detail || "Signup failed. Please try a different username/email.");
+                    return false;
+                }
+            } catch (err) {
+                console.error("Signup error:", err);
+                alert("Network error creating account.");
+                return false;
+            }
         }
 
         // Real-time password match feedback

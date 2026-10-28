@@ -406,6 +406,15 @@
 
                 <button type="submit" class="submit-btn">Continue</button>
 
+                <div style="margin-top: 14px; padding: 10px; background: rgba(237, 242, 244, 0.08); border-radius: 12px; border: 1px solid rgba(237, 242, 244, 0.12); font-size: 11px; text-align: left;">
+                    <div style="font-weight: 700; color: #ff758f; margin-bottom: 6px;">Demo Quick-Fill:</div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button type="button" style="background: rgba(239,35,60,0.25); border: 1px solid var(--red-accent); color: #fff; padding: 3px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;" onclick="fillCreds('admin@123', 'gym123')">👑 Owner/Admin</button>
+                        <button type="button" style="background: rgba(46,196,182,0.25); border: 1px solid #2ec4b6; color: #fff; padding: 3px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;" onclick="fillCreds('rohan.sharma@gmail.com', 'gym123')">🏋️ Member</button>
+                        <button type="button" style="background: rgba(255,159,28,0.25); border: 1px solid #ff9f1c; color: #fff; padding: 3px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;" onclick="fillCreds('ananya.verma@titans.com', 'gym123')">📋 Trainer</button>
+                    </div>
+                </div>
+
                 <div class="auth-footer">
                     <span>Don't have an account?</span>
                     <a href="signup.html">Sign Up</a>
@@ -414,6 +423,13 @@
         </div>
     </main>
 
+    <script>
+        function fillCreds(email, pwd) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = pwd;
+            document.getElementById('terms').checked = true;
+        }
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

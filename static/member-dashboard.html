@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard - Titans Fitness Studio</title>
+    <style>
+        :root {
+            --slate: #8d99ae;
+            --light-bg: #edf2f4;
+            --red-accent: #ef233c;
+            --crimson: #d80032;
+            --dark-card: rgba(17, 21, 28, 0.72);
+            --dark-card-hover: rgba(26, 32, 44, 0.85);
+            --dark-border: rgba(237, 242, 244, 0.12);
+            --success-green: #2ec4b6;
+            --warning-amber: #ff9f1c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--light-bg);
+            position: relative;
+            background-color: #0d1117;
+            overflow-x: hidden;
+        }
+
+        /* Blurred gym background */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            z-index: -1;
+            background-image: 
+                linear-gradient(
+                    180deg,
+                    rgba(10, 14, 20, 0.55) 0%,
+                    rgba(8, 10, 15, 0.88) 100%
+                ),
+                url("background.jpg"),
+                url("gym-bg.jpg");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            filter: blur(8px);
+            transform: scale(1.04);
+        }
+
+        /* Glass Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px;
+            background: rgba(17, 21, 28, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--dark-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--light-bg);
+        }
+
+        header h1 span {
+            color: var(--red-accent);
+        }
+
+        .role-badge {
+            background: rgba(239, 35, 60, 0.18);
+            border: 1px solid var(--red-accent);
+            color: #ff758f;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--light-bg);
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--red-accent);
+        }
+
+        .role-switcher {
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid var(--dark-border);
+            color: var(--light-bg);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 16px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-switcher:hover {
+            background: rgba(237, 242, 244, 0.16);
+            border-color: var(--slate);
+        }
+
+        .role-switcher option {
+            background: #11151c;
+            color: var(--light-bg);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 12px;
+            border-left: 1px solid var(--dark-border);
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(216, 0, 50, 0.4);
+        }
+
+        .user-info {
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .user-id {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: var(--slate);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            color: var(--red-accent);
+            background: rgba(239, 35, 60, 0.1);
+        }
+
+        /* Main Layout */
+        main {
+            flex: 1;
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 20px 80px 20px;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(239, 35, 60, 0.22) 0%, rgba(17, 21, 28, 0.75) 100%);
+            border: 1px solid rgba(239, 35, 60, 0.35);
+            border-radius: 20px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::after {
+            content: "TITAN";
+            position: absolute;
+            right: -20px;
+            bottom: -25px;
+            font-size: 110px;
+            font-weight: 900;
+            color: rgba(237, 242, 244, 0.03);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .banner-text h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .banner-text p {
+            color: var(--slate);
+            font-size: 13px;
+            max-width: 580px;
+        }
+
+        .banner-actions {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            color: var(--light-bg);
+            border: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(216, 0, 50, 0.4);
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(216, 0, 50, 0.55);
+            background: linear-gradient(135deg, #ff3b53, var(--crimson));
+        }
+
+        .secondary-btn {
+            background: rgba(237, 242, 244, 0.1);
+            color: var(--light-bg);
+            border: 1px solid var(--dark-border);
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(237, 242, 244, 0.18);
+            border-color: var(--slate);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: var(--dark-card-hover);
+            border-color: rgba(239, 35, 60, 0.35);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--slate);
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: rgba(239, 35, 60, 0.15);
+            color: var(--red-accent);
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--light-bg);
+            margin-bottom: 6px;
+        }
+
+        .stat-detail {
+            font-size: 12px;
+            color: var(--slate);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-highlight {
+            color: var(--success-green);
+            font-weight: 700;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 950px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 18px;
+            padding: 22px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(237, 242, 244, 0.08);
+            padding-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title span {
+            color: var(--red-accent);
+        }
+
+        /* Workout Checklist */
+        .workout-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .workout-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(237, 242, 244, 0.04);
+            border: 1px solid rgba(237, 242, 244, 0.07);
+            padding: 12px 16px;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .workout-item:hover {
+            background: rgba(237, 242, 244, 0.08);
+            border-color: rgba(239, 35, 60, 0.3);
+        }
+
+        .workout-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .workout-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1.5px solid var(--slate);
+            background: rgba(237, 242, 244, 0.1);
+            cursor: pointer;
+            display: grid;
+            place-content: center;
+            transition: all 0.2s;
+        }
+
+        .workout-checkbox:checked {
+            background: var(--red-accent);
+            border-color: var(--crimson);
+        }
+
+        .workout-checkbox:checked::before {
+            content: "✓";
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .workout-checkbox:checked + .workout-text .exercise-name {
+            text-decoration: line-through;
+            color: var(--slate);
+        }
+
+        .exercise-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--light-bg);
+            transition: color 0.2s;
+        }
+
+        .exercise-sets {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        .target-tag {
+            background: rgba(239, 35, 60, 0.15);
+            color: #ff859b;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+
+        /* Schedule items */
+        .schedule-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(237, 242, 244, 0.06);
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .time-box {
+            background: rgba(239, 35, 60, 0.15);
+            border: 1px solid rgba(239, 35, 60, 0.3);
+            border-radius: 12px;
+            padding: 8px 12px;
+            text-align: center;
+            min-width: 68px;
+        }
+
+        .time-hour {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--red-accent);
+        }
+
+        .time-ampm {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--slate);
+        }
+
+        .class-details h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--light-bg);
+        }
+
+        .class-details p {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        /* Water & Macros Progress */
+        .tracker-metric {
+            margin-bottom: 16px;
+        }
+
+        .tracker-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            background: rgba(237, 242, 244, 0.1);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--red-accent), #ff758f);
+            transition: width 0.4s ease;
+        }
+
+        .quick-water-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .pill-btn {
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid var(--dark-border);
+            color: var(--light-bg);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pill-btn:hover {
+            background: rgba(239, 35, 60, 0.2);
+            border-color: var(--red-accent);
+            color: #fff;
+        }
+
+        /* Trainer mini card */
+        .trainer-mini-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(237, 242, 244, 0.04);
+            border: 1px solid rgba(237, 242, 244, 0.08);
+            padding: 14px;
+            border-radius: 16px;
+        }
+
+        .trainer-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #2a3342;
+            border: 2px solid var(--red-accent);
+            display: grid;
+            place-content: center;
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .trainer-details h4 {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .trainer-details p {
+            font-size: 11px;
+            color: var(--slate);
+            margin-bottom: 6px;
+        }
+
+        /* ================= AI CHATBOT (CONNECTED TO BACKEND API) ================= */
+        .chat-widget-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            box-shadow: 0 8px 24px rgba(216, 0, 50, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            z-index: 1000;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .chat-widget-button:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 12px 28px rgba(216, 0, 50, 0.7);
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background: #2ec4b6;
+            color: #0d1117;
+            font-size: 10px;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #0d1117;
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 92px;
+            right: 24px;
+            width: 380px;
+            max-width: calc(100vw - 48px);
+            height: 540px;
+            background: rgba(17, 21, 28, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 35, 60, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeInSlide 0.28s ease forwards;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .chat-header {
+            padding: 14px 18px;
+            background: rgba(239, 35, 60, 0.15);
+            border-bottom: 1px solid var(--dark-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bot-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .bot-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--light-bg);
+        }
+
+        .bot-status {
+            font-size: 10px;
+            color: var(--success-green);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success-green);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .chat-controls button {
+            background: transparent;
+            border: none;
+            color: var(--slate);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: color 0.2s;
+        }
+
+        .chat-controls button:hover {
+            color: var(--light-bg);
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb {
+            background: rgba(237, 242, 244, 0.15);
+            border-radius: 4px;
+        }
+
+        .chat-message {
+            max-width: 85%;
+            font-size: 12px;
+            line-height: 1.45;
+            padding: 10px 14px;
+            border-radius: 14px;
+            word-break: break-word;
+        }
+
+        .chat-message.bot {
+            align-self: flex-start;
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid rgba(237, 242, 244, 0.1);
+            color: var(--light-bg);
+            border-bottom-left-radius: 3px;
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            color: #ffffff;
+            border-bottom-right-radius: 3px;
+            box-shadow: 0 4px 12px rgba(216, 0, 50, 0.35);
+        }
+
+        .chat-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 6px 14px 10px 14px;
+            border-top: 1px solid rgba(237, 242, 244, 0.05);
+        }
+
+        .prompt-chip {
+            background: rgba(237, 242, 244, 0.07);
+            border: 1px solid var(--dark-border);
+            color: var(--slate);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .prompt-chip:hover {
+            color: var(--light-bg);
+            border-color: var(--red-accent);
+            background: rgba(239, 35, 60, 0.15);
+        }
+
+        .chat-footer {
+            padding: 12px 14px;
+            background: rgba(17, 21, 28, 0.8);
+            border-top: 1px solid var(--dark-border);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(237, 242, 244, 0.94);
+            border: 1px solid transparent;
+            border-radius: 18px;
+            padding: 8px 14px;
+            font-size: 12px;
+            color: #111827;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--red-accent);
+            background: #ffffff;
+        }
+
+        .chat-send-btn {
+            background: var(--red-accent);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.08);
+            background: var(--crimson);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: rgba(237, 242, 244, 0.08);
+            padding: 8px 12px;
+            border-radius: 12px;
+            gap: 4px;
+        }
+
+        .typing-indicator span {
+            width: 5px;
+            height: 5px;
+            background: var(--slate);
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.2s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand-container">
+            <h1>Titans <span>Fitness Studio</span></h1>
+            <span class="role-badge">Member Portal</span>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-link active">Dashboard</a></li>
+                <li><a href="#workouts" class="nav-link">Workouts</a></li>
+                <li><a href="#schedule" class="nav-link">Classes</a></li>
+                <li>
+                    <select class="role-switcher" onchange="location = this.value;">
+                        <option value="member-dashboard.html" selected>Member View</option>
+                        <option value="trainer-dashboard.html">Switch to Trainer</option>
+                        <option value="admin-dashboard.html">Switch to Admin/Owner</option>
+                    </select>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="user-profile">
+            <div class="user-avatar">RS</div>
+            <div class="user-info">
+                <div class="user-name">Rohan Sharma</div>
+                <div class="user-id">ID: #TITAN-9204</div>
+            </div>
+            <a href="login.html" class="logout-btn" title="Sign Out">Log Out</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Welcome Hero Banner -->
+        <section class="welcome-banner">
+            <div class="banner-text">
+                <h2>Hello, Rohan! 💪</h2>
+                <p>You're on a <strong>12-day workout streak</strong>. Today is Hypertrophy Push Day. Let's hit today's targets!</p>
+            </div>
+            <div class="banner-actions">
+                <button class="cta-btn" onclick="openChatWithPrompt('What warmup routine should I do before starting today bench press?')">
+                    ⚡ Ask FitBuddy Coach
+                </button>
+                <button class="secondary-btn" onclick="showGymPass()">
+                    📱 Gym Pass (QR)
+                </button>
+            </div>
+        </section>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Membership Status</span>
+                    <div class="stat-icon">👑</div>
+                </div>
+                <div class="stat-value">Titan Elite</div>
+                <div class="stat-detail">₹4,499/mo (Auto-Pay Active) • <span class="stat-highlight">Active</span></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Workouts This Week</span>
+                    <div class="stat-icon">🏋️</div>
+                </div>
+                <div class="stat-value">4 / 5 <span style="font-size: 14px; color: var(--slate); font-weight: 600;">Days</span></div>
+                <div class="stat-detail"><span class="stat-highlight">80%</span> of weekly goal reached</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Calories Burned</span>
+                    <div class="stat-icon">🔥</div>
+                </div>
+                <div class="stat-value">2,840 <span style="font-size: 14px; color: var(--slate); font-weight: 600;">kcal</span></div>
+                <div class="stat-detail"><span class="stat-highlight">+12%</span> vs last week</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Workout Streak</span>
+                    <div class="stat-icon">⚡</div>
+                </div>
+                <div class="stat-value">12 <span style="font-size: 14px; color: var(--slate); font-weight: 600;">Days</span></div>
+                <div class="stat-detail">Personal best: 21 days</div>
+            </div>
+        </section>
+
+        <!-- Main Content 2-Column Grid -->
+        <div class="content-grid">
+            <!-- Left Column: Workout Routine & Schedule -->
+            <div class="main-column">
+                <!-- Today's Workout Section -->
+                <div class="panel-card" id="workouts">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <span>Today's Routine:</span> Chest & Tricep Hypertrophy
+                        </div>
+                        <span class="target-tag">Intermediate</span>
+                    </div>
+
+                    <div class="workout-list">
+                        <div class="workout-item">
+                            <div class="workout-info">
+                                <input type="checkbox" class="workout-checkbox" id="w1" checked onchange="toggleWorkout(1, this.checked)">
+                                <div class="workout-text">
+                                    <label for="w1" class="exercise-name">Barbell Bench Press</label>
+                                    <div class="exercise-sets">4 Sets • 8-10 Reps • 85 kg target</div>
+                                </div>
+                            </div>
+                            <span class="target-tag">Chest</span>
+                        </div>
+
+                        <div class="workout-item">
+                            <div class="workout-info">
+                                <input type="checkbox" class="workout-checkbox" id="w2" onchange="toggleWorkout(2, this.checked)">
+                                <div class="workout-text">
+                                    <label for="w2" class="exercise-name">Incline Dumbbell Press</label>
+                                    <div class="exercise-sets">3 Sets • 10-12 Reps • 26 kg</div>
+                                </div>
+                            </div>
+                            <span class="target-tag">Upper Chest</span>
+                        </div>
+
+                        <div class="workout-item">
+                            <div class="workout-info">
+                                <input type="checkbox" class="workout-checkbox" id="w3" onchange="toggleWorkout(3, this.checked)">
+                                <div class="workout-text">
+                                    <label for="w3" class="exercise-name">Cable Chest Flyes</label>
+                                    <div class="exercise-sets">3 Sets • 15 Reps • High to Low</div>
+                                </div>
+                            </div>
+                            <span class="target-tag">Isolation</span>
+                        </div>
+
+                        <div class="workout-item">
+                            <div class="workout-info">
+                                <input type="checkbox" class="workout-checkbox" id="w4" onchange="toggleWorkout(4, this.checked)">
+                                <div class="workout-text">
+                                    <label for="w4" class="exercise-name">Tricep Rope Pushdowns</label>
+                                    <div class="exercise-sets">4 Sets • 12 Reps • Superset with Dips</div>
+                                </div>
+                            </div>
+                            <span class="target-tag">Triceps</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Studio Classes & Bookings -->
+                <div class="panel-card" id="schedule">
+                    <div class="panel-header">
+                        <div class="panel-title">Upcoming <span>Studio Classes (IST)</span></div>
+                        <button class="pill-btn" onclick="bookClass('HIIT Desi Power Shred')">+ Book Class</button>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="time-box">
+                            <div class="time-hour">06:00</div>
+                            <div class="time-ampm">PM TODAY</div>
+                        </div>
+                        <div class="class-details">
+                            <h4>HIIT Desi Power Shred</h4>
+                            <p>Studio A • Coach Kabir Malhotra • 45 Mins</p>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="time-box">
+                            <div class="time-hour">08:30</div>
+                            <div class="time-ampm">AM TOMORROW</div>
+                        </div>
+                        <div class="class-details">
+                            <h4>Power Vinyasa & Core Mobility</h4>
+                            <p>Zen Studio • Coach Ananya Verma • 60 Mins</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Nutrition, Water, Trainer -->
+            <div class="side-column">
+                <!-- Daily Hydration & Macros -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">Hydration & <span>Nutrition</span></div>
+                        <span id="water-count" style="font-size: 12px; font-weight: 700; color: var(--red-accent);">2,250 / 3,500 ml</span>
+                    </div>
+
+                    <div class="tracker-metric">
+                        <div class="tracker-labels">
+                            <span>Water Intake</span>
+                            <span id="water-pct">65%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="water-bar" style="width: 65%;"></div>
+                        </div>
+                        <div class="quick-water-buttons">
+                            <button class="pill-btn" onclick="addWater(250)">+250 ml</button>
+                            <button class="pill-btn" onclick="addWater(500)">+500 ml</button>
+                            <button class="pill-btn" onclick="resetWater()">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="tracker-metric" style="margin-top: 18px;">
+                        <div class="tracker-labels">
+                            <span>Daily Protein Target</span>
+                            <span>142g / 180g</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: 78%; background: linear-gradient(90deg, #ff9f1c, #ef233c);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assigned Personal Trainer -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">Personal <span>Trainer</span></div>
+                    </div>
+
+                    <div class="trainer-mini-card">
+                        <div class="trainer-avatar">AV</div>
+                        <div class="trainer-details">
+                            <h4>Coach Ananya Verma</h4>
+                            <p>Senior Strength & Conditioning Coach (Gold Medalist)</p>
+                            <button class="cta-btn" style="padding: 6px 14px; font-size: 11px;" onclick="openChatWithPrompt('How do I optimize recovery after Coach Ananya\'s leg workout?')">
+                                Message Coach via AI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Floating Chatbot Widget Button -->
+    <div class="chat-widget-button" onclick="toggleChat()" id="chatButton" title="Titan AI Fitness Assistant">
+        <span class="chat-badge">AI</span>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <!-- AI Chatbot Window -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="bot-avatar">⚡</div>
+                <div>
+                    <div class="bot-name">FlexiBuddy</div>
+                    <div class="bot-status"><span class="status-dot"></span> Active Coach AI (FastAPI Backend)</div>
+                </div>
+            </div>
+            <div class="chat-controls">
+                <button onclick="clearChat()" title="Clear Chat">🗑️</button>
+                <button onclick="toggleChat()" title="Close Chat">✕</button>
+            </div>
+        </div>
+
+        <div class="chat-body" id="chatBody">
+            <div class="chat-message bot">
+                Hello Rohan! I'm <strong>FlexiBuddy</strong>. Need meal plans, workout schedules, injury guidance, or form breakdown? Ask away!
+            </div>
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="chat-chips">
+            <span class="prompt-chip" onclick="sendQuickPrompt('Suggest high protein vegetarian Indian diet')">🥗 Veg Indian Diet</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Warm-up routine for chest workout')">🔥 Chest Warmup</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('What are Titans gym peak hours in IST?')">⏱️ Gym Peak Hours</span>
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask your Titan coach..." onkeypress="handleKeyPress(event)">
+            <button class="chat-send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // Water Tracker Logic synchronized with Backend
+        let currentWater = 2250;
+        const targetWater = 3500;
+
+        function updateWaterUI(ml, pct) {
+            document.getElementById('water-count').textContent = `${ml.toLocaleString()} / ${targetWater.toLocaleString()} ml`;
+            document.getElementById('water-pct').textContent = `${pct}%`;
+            document.getElementById('water-bar').style.width = `${pct}%`;
+        }
+
+        async function addWater(amount) {
+            currentWater += amount;
+            const pct = Math.min(100, Math.round((currentWater / targetWater) * 100));
+            updateWaterUI(currentWater, pct);
+
+            try {
+                await fetch('/api/member/water', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ amount: amount, reset: false })
+                });
+            } catch (e) {
+                console.log("Local water updated.");
+            }
+        }
+
+        async function resetWater() {
+            currentWater = 0;
+            updateWaterUI(0, 0);
+
+            try {
+                await fetch('/api/member/water', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ amount: 0, reset: true })
+                });
+            } catch (e) {
+                console.log("Local water reset.");
+            }
+        }
+
+        // Workout Completion Toggle
+        async function toggleWorkout(id, isChecked) {
+            try {
+                await fetch('/api/member/workout/toggle', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ workout_id: id })
+                });
+            } catch (e) {
+                console.log("Workout state saved in browser session.");
+            }
+        }
+
+        // Book Class
+        async function bookClass(title) {
+            try {
+                const res = await fetch('/api/member/book-class', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ class_id: 1, member_name: 'Rohan Sharma' })
+                });
+                const data = await res.json();
+                alert(data.message || `You have booked ${title}! See you on the gym floor.`);
+            } catch (e) {
+                alert(`Booking confirmed for ${title}!`);
+            }
+        }
+
+        function showGymPass() {
+            alert("TITANS SMART PASS\n\nMember: Rohan Sharma (#TITAN-9204)\nAccess: All Floors (Free Weights, Cardio, Zen Studio)\nStatus: ACTIVE & VERIFIED\nNFC RFID: 04:A2:8F:B1:9C\nValid Thru: Dec 2026");
+        }
+
+        // AI Chatbot UI Logic Connected to Backend API
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody = document.getElementById('chatBody');
+        const chatInput = document.getElementById('chatInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        function toggleChat() {
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+            if (chatWindow.style.display === 'flex') {
+                chatInput.focus();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendQuickPrompt(promptText) {
+            chatInput.value = promptText;
+            sendMessage();
+        }
+
+        function openChatWithPrompt(promptText) {
+            chatWindow.style.display = 'flex';
+            chatInput.value = promptText;
+            sendMessage();
+        }
+
+        function clearChat() {
+            chatBody.innerHTML = `
+                <div class="chat-message bot">
+                    Hello Rohan! I'm <strong>FlexiBuddy</strong>. Need meal plans, workout schedules, injury guidance, or form breakdown? Ask away!
+                </div>
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+        }
+
+        function appendMessage(sender, text) {
+            const msg = document.createElement('div');
+            msg.className = `chat-message ${sender}`;
+            let formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            msg.innerHTML = formatted;
+            chatBody.insertBefore(msg, typingIndicator);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            chatInput.value = '';
+
+            typingIndicator.style.display = 'flex';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        user_name: 'Rohan Sharma',
+                        user_role: 'member',
+                        user_context: 'member_id=TITAN-9204, streak=12, goal=hypertrophy'
+                    })
+                });
+
+                typingIndicator.style.display = 'none';
+
+                if (!response.ok) {
+                    throw new Error(`Server returned status ${response.status}`);
+                }
+
+                const data = await response.json();
+                appendMessage('bot', data.reply || "Let's keep crushing your workout!");
+            } catch (err) {
+                console.error("Chat error:", err);
+                typingIndicator.style.display = 'none';
+                appendMessage('bot', "FlexiBuddy is syncing with local training logs. Your workout progress and water tracking remain fully active!");
+            }
+        }
+    </script>
+</body>
+</html>

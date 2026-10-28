@@ -1,25 +1,36 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 import json
 import os
 
-app = FastAPI(title="xyx gym Management API")
+from app.api.auth import router as auth_router
+from app.api.chat import router as chat_router
+from app.api.member import router as member_router
+from app.api.trainer import router as trainer_router
+from app.api.admin import router as admin_router
+
+app = FastAPI(
+    title="Titans Fitness Studio Management API",
+    description="Backend API powering Titans Fitness Studio Dashboards & FitBuddy AI Copilot"
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 # ------------------------------------------------------------------
-# 1. DATA MODELS
+# 1. API ROUTERS
 # ------------------------------------------------------------------
-class LoginData(BaseModel):
-    username: str
-    password: str
+app.include_router(auth_router)
+app.include_router(chat_router)
+app.include_router(member_router)
+app.include_router(trainer_router)
+app.include_router(admin_router)
 
 # ------------------------------------------------------------------
-# 2. API ENDPOINTS (Must be defined BEFORE the static mount below)
+# 2. FEEDBACK ENDPOINT (Preserving existing JSON dataset)
 # ------------------------------------------------------------------
-@app.get("/api/feedback")
+@app.get("/api/feedback", tags=["Feedback"])
 def get_feedback():
     feedback_path = os.path.join(BASE_DIR, "feedback.json")
     if not os.path.exists(feedback_path):
@@ -27,16 +38,19 @@ def get_feedback():
     with open(feedback_path, "r", encoding="utf-8") as file:
         return json.load(file)
 
-@app.post("/api/login")
-def login(credentials: LoginData):
-    print(f"Received login attempt for user: {credentials.email}")
-    if credentials.email == "admin@123" and credentials.password == "gym123":
-        return {"status": "success", "message": "Login successful!"}
-    raise HTTPException(status_code=401, detail="Invalid username or password.")
+# ------------------------------------------------------------------
+# 3. COMPATIBILITY & REDIRECT ROUTES
+# ------------------------------------------------------------------
+@app.get("/ca.login.html")
+def redirect_ca_login():
+    return RedirectResponse(url="/login.html", status_code=307)
 
 # ------------------------------------------------------------------
-# 3. UNIVERSAL UI SERVING
+# 4. UNIVERSAL STATIC FILE SERVING
 # ------------------------------------------------------------------
-# Mounts the static directory to the root. 
-# html=True automatically resolves "/" to index.html and "/login" to login.html
+# Must be mounted last so API endpoints take priority
 app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

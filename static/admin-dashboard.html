@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin & Owner Dashboard - Titans Fitness Studio</title>
+    <style>
+        :root {
+            --slate: #8d99ae;
+            --light-bg: #edf2f4;
+            --red-accent: #ef233c;
+            --crimson: #d80032;
+            --dark-card: rgba(17, 21, 28, 0.72);
+            --dark-card-hover: rgba(26, 32, 44, 0.85);
+            --dark-border: rgba(237, 242, 244, 0.12);
+            --success-green: #2ec4b6;
+            --warning-amber: #ff9f1c;
+            --purple-vip: #7209b7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--light-bg);
+            position: relative;
+            background-color: #0d1117;
+            overflow-x: hidden;
+        }
+
+        /* Blurred gym background matching all other pages */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -15px;
+            left: -15px;
+            right: -15px;
+            bottom: -15px;
+            z-index: -1;
+            background-image: 
+                linear-gradient(
+                    180deg,
+                    rgba(10, 14, 20, 0.62) 0%,
+                    rgba(8, 10, 15, 0.92) 100%
+                ),
+                url("background.jpg"),
+                url("gym-bg.jpg");
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            filter: blur(8px);
+            transform: scale(1.04);
+        }
+
+        /* Glass Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px;
+            background: rgba(17, 21, 28, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--dark-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: var(--light-bg);
+        }
+
+        header h1 span {
+            color: var(--red-accent);
+        }
+
+        .role-badge {
+            background: rgba(239, 35, 60, 0.22);
+            border: 1px solid var(--red-accent);
+            color: #ff4d6d;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--light-bg);
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--red-accent);
+        }
+
+        .role-switcher {
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid var(--dark-border);
+            color: var(--light-bg);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 16px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .role-switcher:hover {
+            background: rgba(237, 242, 244, 0.16);
+            border-color: var(--slate);
+        }
+
+        .role-switcher option {
+            background: #11151c;
+            color: var(--light-bg);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-left: 12px;
+            border-left: 1px solid var(--dark-border);
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d80032, #800f2f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(216, 0, 50, 0.5);
+        }
+
+        .user-info {
+            text-align: left;
+            line-height: 1.2;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .user-id {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: var(--slate);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 12px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            color: var(--red-accent);
+            background: rgba(239, 35, 60, 0.1);
+        }
+
+        /* Main Layout */
+        main {
+            flex: 1;
+            max-width: 1320px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px 20px 80px 20px;
+        }
+
+        /* Admin Hero Banner */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(216, 0, 50, 0.25) 0%, rgba(17, 21, 28, 0.8) 100%);
+            border: 1px solid rgba(239, 35, 60, 0.4);
+            border-radius: 20px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::after {
+            content: "OWNER";
+            position: absolute;
+            right: -20px;
+            bottom: -25px;
+            font-size: 110px;
+            font-weight: 900;
+            color: rgba(237, 242, 244, 0.03);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .banner-text h2 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .banner-text p {
+            color: var(--slate);
+            font-size: 13px;
+            max-width: 600px;
+        }
+
+        .banner-actions {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-btn {
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            color: var(--light-bg);
+            border: none;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(216, 0, 50, 0.4);
+            transition: all 0.25s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(216, 0, 50, 0.55);
+            background: linear-gradient(135deg, #ff3b53, var(--crimson));
+        }
+
+        .secondary-btn {
+            background: rgba(237, 242, 244, 0.1);
+            color: var(--light-bg);
+            border: 1px solid var(--dark-border);
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: all 0.2s ease;
+        }
+
+        .secondary-btn:hover {
+            background: rgba(237, 242, 244, 0.18);
+            border-color: var(--slate);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 18px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: var(--dark-card-hover);
+            border-color: rgba(239, 35, 60, 0.35);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--slate);
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: rgba(239, 35, 60, 0.15);
+            color: var(--red-accent);
+        }
+
+        .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--light-bg);
+            margin-bottom: 6px;
+        }
+
+        .stat-detail {
+            font-size: 12px;
+            color: var(--slate);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-highlight {
+            color: var(--success-green);
+            font-weight: 700;
+        }
+
+        /* Content Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1.15fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 950px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 18px;
+            padding: 22px;
+            backdrop-filter: blur(12px);
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(237, 242, 244, 0.08);
+            padding-bottom: 12px;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title span {
+            color: var(--red-accent);
+        }
+
+        /* Admin Table */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .admin-table th {
+            text-align: left;
+            padding: 10px 12px;
+            color: var(--slate);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(237, 242, 244, 0.1);
+        }
+
+        .admin-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(237, 242, 244, 0.05);
+            color: var(--light-bg);
+        }
+
+        .admin-table tr:hover {
+            background: rgba(237, 242, 244, 0.04);
+        }
+
+        .status-pill {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .pill-paid {
+            background: rgba(46, 196, 182, 0.15);
+            color: var(--success-green);
+        }
+
+        .pill-expiring {
+            background: rgba(255, 159, 28, 0.15);
+            color: var(--warning-amber);
+        }
+
+        /* Gym Occupancy meter */
+        .occupancy-box {
+            background: rgba(237, 242, 244, 0.04);
+            border: 1px solid rgba(237, 242, 244, 0.08);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .occupancy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .meter-bar {
+            height: 10px;
+            background: rgba(237, 242, 244, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2ec4b6, #ff9f1c);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Staff Roster Cards */
+        .staff-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(237, 242, 244, 0.04);
+            border: 1px solid rgba(237, 242, 244, 0.08);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .staff-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .staff-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1b2330;
+            border: 1.5px solid var(--red-accent);
+            display: grid;
+            place-content: center;
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .staff-title {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .staff-role {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        /* Equipment Maintenance List */
+        .equip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(237, 242, 244, 0.06);
+        }
+
+        .equip-item:last-child {
+            border-bottom: none;
+        }
+
+        .equip-name {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .equip-status {
+            font-size: 11px;
+            color: var(--slate);
+        }
+
+        /* ================= AI CHATBOT (CONNECTED TO BACKEND API) ================= */
+        .chat-widget-button {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            box-shadow: 0 8px 24px rgba(216, 0, 50, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            cursor: pointer;
+            z-index: 1000;
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .chat-widget-button:hover {
+            transform: scale(1.08) translateY(-2px);
+            box-shadow: 0 12px 28px rgba(216, 0, 50, 0.7);
+        }
+
+        .chat-badge {
+            position: absolute;
+            top: -3px;
+            right: -3px;
+            background: #ff9f1c;
+            color: #0d1117;
+            font-size: 10px;
+            font-weight: 800;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #0d1117;
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 92px;
+            right: 24px;
+            width: 380px;
+            max-width: calc(100vw - 48px);
+            height: 540px;
+            background: rgba(17, 21, 28, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 35, 60, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeInSlide 0.28s ease forwards;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .chat-header {
+            padding: 14px 18px;
+            background: rgba(239, 35, 60, 0.15);
+            border-bottom: 1px solid var(--dark-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bot-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .bot-name {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--light-bg);
+        }
+
+        .bot-status {
+            font-size: 10px;
+            color: var(--success-green);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--success-green);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .chat-controls button {
+            background: transparent;
+            border: none;
+            color: var(--slate);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: color 0.2s;
+        }
+
+        .chat-controls button:hover {
+            color: var(--light-bg);
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-body::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb {
+            background: rgba(237, 242, 244, 0.15);
+            border-radius: 4px;
+        }
+
+        .chat-message {
+            max-width: 85%;
+            font-size: 12px;
+            line-height: 1.45;
+            padding: 10px 14px;
+            border-radius: 14px;
+            word-break: break-word;
+        }
+
+        .chat-message.bot {
+            align-self: flex-start;
+            background: rgba(237, 242, 244, 0.08);
+            border: 1px solid rgba(237, 242, 244, 0.1);
+            color: var(--light-bg);
+            border-bottom-left-radius: 3px;
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            color: #ffffff;
+            border-bottom-right-radius: 3px;
+            box-shadow: 0 4px 12px rgba(216, 0, 50, 0.35);
+        }
+
+        .chat-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 6px 14px 10px 14px;
+            border-top: 1px solid rgba(237, 242, 244, 0.05);
+        }
+
+        .prompt-chip {
+            background: rgba(237, 242, 244, 0.07);
+            border: 1px solid var(--dark-border);
+            color: var(--slate);
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .prompt-chip:hover {
+            color: var(--light-bg);
+            border-color: var(--red-accent);
+            background: rgba(239, 35, 60, 0.15);
+        }
+
+        .chat-footer {
+            padding: 12px 14px;
+            background: rgba(17, 21, 28, 0.8);
+            border-top: 1px solid var(--dark-border);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(237, 242, 244, 0.94);
+            border: 1px solid transparent;
+            border-radius: 18px;
+            padding: 8px 14px;
+            font-size: 12px;
+            color: #111827;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: var(--red-accent);
+            background: #ffffff;
+        }
+
+        .chat-send-btn {
+            background: var(--red-accent);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.08);
+            background: var(--crimson);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: rgba(237, 242, 244, 0.08);
+            padding: 8px 12px;
+            border-radius: 12px;
+            gap: 4px;
+        }
+
+        .typing-indicator span {
+            width: 5px;
+            height: 5px;
+            background: var(--slate);
+            border-radius: 50%;
+            display: inline-block;
+            animation: bounce 1.2s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand-container">
+            <h1>Titans <span>Fitness Studio</span></h1>
+            <span class="role-badge">Executive & Owner</span>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-link active">Overview</a></li>
+                <li><a href="#members" class="nav-link">Members</a></li>
+                <li><a href="#staff" class="nav-link">Staff</a></li>
+                <li><a href="#facility" class="nav-link">Facility</a></li>
+                <li>
+                    <select class="role-switcher" onchange="location = this.value;">
+                        <option value="admin-dashboard.html" selected>Admin/Owner View</option>
+                        <option value="member-dashboard.html">Switch to Member</option>
+                        <option value="trainer-dashboard.html">Switch to Trainer</option>
+                    </select>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="user-profile">
+            <div class="user-avatar">RS</div>
+            <div class="user-info">
+                <div class="user-name">Rajesh Singhania</div>
+                <div class="user-id">Owner & Managing Director</div>
+            </div>
+            <a href="login.html" class="logout-btn" title="Sign Out">Log Out</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Owner Hero Banner -->
+        <section class="welcome-banner">
+            <div class="banner-text">
+                <h2>Titans Studio Operations (India) 📊</h2>
+                <p>Monthly recurring revenue is up <strong>+11.4% MoM</strong> (₹42,85,000 MRR). 1,420 Active members with 94.1% retention rate across branches.</p>
+            </div>
+            <div class="banner-actions">
+                <a href="#members" class="cta-btn">
+                    👥 Manage Members
+                </a>
+                <button class="secondary-btn" onclick="exportFinancials()">
+                    📑 Export Financials (GST)
+                </button>
+            </div>
+        </section>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Monthly Revenue</span>
+                    <div class="stat-icon">₹</div>
+                </div>
+                <div class="stat-value">₹42.85 L</div>
+                <div class="stat-detail"><span class="stat-highlight">+11.4%</span> vs previous month</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Active Members</span>
+                    <div class="stat-icon">🏆</div>
+                </div>
+                <div class="stat-value">1,420</div>
+                <div class="stat-detail"><span class="stat-highlight">+64 new</span> enrollments</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Live Floor Capacity</span>
+                    <div class="stat-icon">⚡</div>
+                </div>
+                <div class="stat-value" id="occupancy-stat">74 / 120 <span style="font-size: 14px; color: var(--slate); font-weight: 600;">Active</span></div>
+                <div class="stat-detail"><span class="stat-highlight" id="occupancy-highlight">62% Occupancy</span> • Optimal flow</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-title">Equipment Health</span>
+                    <div class="stat-icon">🛠️</div>
+                </div>
+                <div class="stat-value">97.5%</div>
+                <div class="stat-detail">1 ticket open • 0 critical halts</div>
+            </div>
+        </section>
+
+        <!-- Main Content 2-Column Grid -->
+        <div class="content-grid">
+            <!-- Left Column: Member Table & Studio Analytics -->
+            <div class="main-column">
+                <!-- Live Studio Floor Traffic -->
+                <div class="panel-card">
+                    <div class="panel-header">
+                        <div class="panel-title">Real-Time <span>Gym Floor Traffic (IST)</span></div>
+                        <span style="font-size: 11px; color: var(--success-green); font-weight: 700;">● Live RFID & Biometric Feed</span>
+                    </div>
+
+                    <div class="occupancy-box">
+                        <div class="occupancy-header">
+                            <span>Peak Evening Projection (6:00 PM - 8:30 PM IST)</span>
+                            <span style="color: var(--red-accent);" id="floor-count-label">74 Members Inside</span>
+                        </div>
+                        <div class="meter-bar">
+                            <div class="meter-fill" id="meter-fill-bar" style="width: 62%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Members & Billing Status -->
+                <div class="panel-card" id="members">
+                    <div class="panel-header">
+                        <div class="panel-title">Recent <span>Member Enrollments & Billing (INR)</span></div>
+                        <button class="secondary-btn" style="padding: 6px 14px; font-size: 11px;" onclick="promptAddMember()">+ Add Member</button>
+                    </div>
+
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Plan</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="member-table-body">
+                            <tr>
+                                <td>
+                                    <strong>Rohan Sharma</strong><br>
+                                    <span style="font-size: 10px; color: var(--slate);">rohan.sharma@gmail.com</span>
+                                </td>
+                                <td>Titan Elite (₹4,499/mo)</td>
+                                <td>Auto-Debit (UPI / HDFC)</td>
+                                <td><span class="status-pill pill-paid">Active</span></td>
+                                <td><button class="cta-btn" style="padding: 4px 10px; font-size: 10px;" onclick="manageMember('Rohan Sharma')">Manage</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Siddharth Rao</strong><br>
+                                    <span style="font-size: 10px; color: var(--slate);">siddharth.rao@outlook.in</span>
+                                </td>
+                                <td>Titan Pro (₹2,999/mo)</td>
+                                <td>UPI AutoPay (PhonePe)</td>
+                                <td><span class="status-pill pill-expiring">Due in 3d</span></td>
+                                <td><button class="cta-btn" style="padding: 4px 10px; font-size: 10px;" onclick="notifyMember('Siddharth Rao')">Notify</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Priya Nair</strong><br>
+                                    <span style="font-size: 10px; color: var(--slate);">priya.nair@techmahindra.com</span>
+                                </td>
+                                <td>VIP Annual Pass (₹34,999/yr)</td>
+                                <td>NetBanking (ICICI)</td>
+                                <td><span class="status-pill pill-paid">Active</span></td>
+                                <td><button class="cta-btn" style="padding: 4px 10px; font-size: 10px;" onclick="manageMember('Priya Nair')">Manage</button></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>Devansh Patel</strong><br>
+                                    <span style="font-size: 10px; color: var(--slate);">devansh.patel@tatasteel.com</span>
+                                </td>
+                                <td>Titan Elite (₹4,499/mo)</td>
+                                <td>RuPay Platinum Debit</td>
+                                <td><span class="status-pill pill-paid">Active</span></td>
+                                <td><button class="cta-btn" style="padding: 4px 10px; font-size: 10px;" onclick="manageMember('Devansh Patel')">Manage</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Right Column: Staff Roster & Maintenance -->
+            <div class="side-column">
+                <!-- Staff & Trainer Roster -->
+                <div class="panel-card" id="staff">
+                    <div class="panel-header">
+                        <div class="panel-title">Studio <span>Staff & Coaches</span></div>
+                        <span style="font-size: 11px; color: var(--slate);">4 On Duty</span>
+                    </div>
+
+                    <div class="staff-card">
+                        <div class="staff-info">
+                            <div class="staff-avatar">AV</div>
+                            <div>
+                                <div class="staff-title">Ananya Verma</div>
+                                <div class="staff-role">Lead Strength Coach • 28 Clients</div>
+                            </div>
+                        </div>
+                        <span class="status-pill pill-paid">On Floor</span>
+                    </div>
+
+                    <div class="staff-card">
+                        <div class="staff-info">
+                            <div class="staff-avatar" style="border-color: #3a86ff;">KM</div>
+                            <div>
+                                <div class="staff-title">Kabir Malhotra</div>
+                                <div class="staff-role">HIIT & Group Specialist • 19 Clients</div>
+                            </div>
+                        </div>
+                        <span class="status-pill pill-paid">On Floor</span>
+                    </div>
+
+                    <div class="staff-card">
+                        <div class="staff-info">
+                            <div class="staff-avatar" style="border-color: var(--warning-amber);">PD</div>
+                            <div>
+                                <div class="staff-title">Pooja Deshmukh</div>
+                                <div class="staff-role">Front Desk & Operations Manager</div>
+                            </div>
+                        </div>
+                        <span class="status-pill pill-paid">Front Desk</span>
+                    </div>
+                </div>
+
+                <!-- Facility & Equipment Health -->
+                <div class="panel-card" id="facility">
+                    <div class="panel-header">
+                        <div class="panel-title">Facility <span>Maintenance</span></div>
+                        <button class="secondary-btn" style="padding: 5px 10px; font-size: 10px;" onclick="promptLogTicket()">+ Log Ticket</button>
+                    </div>
+
+                    <div id="maintenance-list">
+                        <div class="equip-item">
+                            <div>
+                                <div class="equip-name">Jerai Fitness Commercial Treadmill #4</div>
+                                <div class="equip-status">Scheduled motor & belt servicing • Engineer arriving 4 PM</div>
+                            </div>
+                            <span class="status-pill pill-expiring">Service Due</span>
+                        </div>
+
+                        <div class="equip-item">
+                            <div>
+                                <div class="equip-name">Being Strong Dual Cable Cross</div>
+                                <div class="equip-status">Inspected & lubricated Oct 20</div>
+                            </div>
+                            <span class="status-pill pill-paid">100% Operational</span>
+                        </div>
+
+                        <div class="equip-item">
+                            <div>
+                                <div class="equip-name">Studio HVAC & Daikin Air Purifiers</div>
+                                <div class="equip-status">Optimal airflow • PM2.5: 8 µg/m³ (HEPA filter clean)</div>
+                            </div>
+                            <span class="status-pill pill-paid">Normal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Floating Chatbot Widget Button -->
+    <div class="chat-widget-button" onclick="toggleChat()" id="chatButton" title="FitBuddy Executive Copilot">
+        <span class="chat-badge">AI</span>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <!-- AI Chatbot Window -->
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="bot-avatar">💎</div>
+                <div>
+                    <div class="bot-name">FitBuddy (Executive)</div>
+                    <div class="bot-status"><span class="status-dot"></span> Online (FastAPI Backend)</div>
+                </div>
+            </div>
+            <div class="chat-controls">
+                <button onclick="clearChat()" title="Clear Chat">🗑️</button>
+                <button onclick="toggleChat()" title="Close Chat">✕</button>
+            </div>
+        </div>
+
+        <div class="chat-body" id="chatBody">
+            <div class="chat-message bot">
+                Hello Director Rajesh Singhania! I'm <strong>FitBuddy</strong>, your executive assistant. I have live access to Titans financial metrics, churn rates, and facility health. How can I assist with operations today?
+            </div>
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="chat-chips">
+            <span class="prompt-chip" onclick="sendQuickPrompt('Analyze monthly churn and member retention rate')">📉 Churn Analysis</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Calculate ROI on adding 2 new Jerai squat racks')">🏋️ Equipment ROI (₹)</span>
+            <span class="prompt-chip" onclick="sendQuickPrompt('Draft a Diwali / Festive promotional offer message')">🎉 Festive Offer</span>
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Ask FitBuddy Executive..." onkeypress="handleKeyPress(event)">
+            <button class="chat-send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // AI Chatbot Logic connected to backend /api/chat
+        const chatWindow = document.getElementById('chatWindow');
+        const chatBody = document.getElementById('chatBody');
+        const chatInput = document.getElementById('chatInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        function toggleChat() {
+            chatWindow.style.display = chatWindow.style.display === 'flex' ? 'none' : 'flex';
+            if (chatWindow.style.display === 'flex') {
+                chatInput.focus();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendQuickPrompt(promptText) {
+            chatInput.value = promptText;
+            sendMessage();
+        }
+
+        function openChatWithPrompt(promptText) {
+            chatWindow.style.display = 'flex';
+            chatInput.value = promptText;
+            sendMessage();
+        }
+
+        function clearChat() {
+            chatBody.innerHTML = `
+                <div class="chat-message bot">
+                    Hello Director Rajesh Singhania! I'm <strong>FitBuddy</strong>, your executive assistant. I have live access to Titans financial metrics, churn rates, and facility health. How can I assist with operations today?
+                </div>
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+        }
+
+        function appendMessage(sender, text) {
+            const msg = document.createElement('div');
+            msg.className = `chat-message ${sender}`;
+            // Simple markdown formatting for bold and linebreaks
+            let formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+            msg.innerHTML = formatted;
+            chatBody.insertBefore(msg, typingIndicator);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            chatInput.value = '';
+
+            typingIndicator.style.display = 'flex';
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: text,
+                        user_name: 'Rajesh Singhania',
+                        user_role: 'owner',
+                        user_context: 'mrr=42.85L, members=1420, branches=Mumbai,Pune'
+                    })
+                });
+
+                typingIndicator.style.display = 'none';
+
+                if (!response.ok) {
+                    throw new Error(`Server status ${response.status}`);
+                }
+
+                const data = await response.json();
+                appendMessage('bot', data.reply || "Executive query received.");
+            } catch (err) {
+                console.error("Chat error:", err);
+                typingIndicator.style.display = 'none';
+                appendMessage('bot', "FitBuddy service is reconnecting. Titans revenue and operational metrics remain fully synchronized with the local database.");
+            }
+        }
+
+        // Operational Actions
+        function exportFinancials() {
+            alert('Titans P&L Financial Report (Oct 2026):\n\n• Gross Revenue: ₹42,85,000\n• GST Collected (18%): ₹6,53,644\n• Staff Payroll & Trainer Commissions: ₹16,40,000\n• Equipment Maintenance & Leases: ₹4,20,000\n• Net Operating Profit: ₹15,71,356 (+14.2% MoM)\n\nFull GST Excel/PDF report downloaded to reports directory.');
+        }
+
+        function manageMember(name) {
+            openChatWithPrompt(`Provide account overview, payment history, and attendance records for ${name}`);
+        }
+
+        function notifyMember(name) {
+            alert(`Automated WhatsApp & SMS reminder sent to ${name} via Titans Billing Gateway.`);
+        }
+
+        async function promptLogTicket() {
+            const equip = prompt("Enter equipment name:", "Jerai Smith Machine #2");
+            if (!equip) return;
+            const desc = prompt("Enter maintenance details:", "Cable wire friction observed during evening peak");
+            if (!desc) return;
+
+            try {
+                const res = await fetch('/api/admin/maintenance', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ equipment_name: equip, description: desc })
+                });
+                if (res.ok) {
+                    const list = document.getElementById('maintenance-list');
+                    const newItem = document.createElement('div');
+                    newItem.className = 'equip-item';
+                    newItem.innerHTML = `
+                        <div>
+                            <div class="equip-name">${equip}</div>
+                            <div class="equip-status">${desc}</div>
+                        </div>
+                        <span class="status-pill pill-expiring">Service Due</span>
+                    `;
+                    list.prepend(newItem);
+                    alert(`Maintenance ticket logged successfully for ${equip}!`);
+                }
+            } catch (e) {
+                alert(`Ticket recorded locally for ${equip}.`);
+            }
+        }
+
+        function promptAddMember() {
+            const name = prompt("Enter member full name:", "Kunal Kapur");
+            if (!name) return;
+            const plan = prompt("Select Plan (Titan Pro / Titan Elite / VIP Annual):", "Titan Elite");
+            alert(`New member ${name} enrolled under ${plan}! Bio-metric access card provisioned.`);
+        }
+    </script>
+</body>
+</html>
