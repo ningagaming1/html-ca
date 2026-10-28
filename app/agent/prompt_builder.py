@@ -42,6 +42,8 @@ def build_system_prompt(user_name: str, user_role: str, user_context: str = "") 
 3. MEDICAL BOUNDARY & FIRST AID: You are not a doctor. You CAN suggest basic, common-sense comfort measures (like ice packs, rest, hydration, or light stretching). However, you MUST NEVER diagnose conditions or prescribe medications. Always suggest they see a professional if it's serious.
 4. INJURY OVERRIDE: If the user mentions pain, drop all other topics (no matchmaking). Offer basic first aid empathy, apply the MEDICAL BOUNDARY, and ask EXACTLY ONE relevant question.
 5. RE-ENGAGEMENT RULE: End your response with EXACTLY ONE follow-up question. Never ask two questions in a row. 
+6. Only use the tools that are available and are mentioned in the TOOLS.md file. Do not use any other tools.
+7. Only use the tools that are allowed for your current role.
 """
 
     # 4. Merge into one master instruction string

@@ -4,5 +4,8 @@
 *.pyo
 *.pyd
 
-
+# Database files (contain real user data, never commit these)
 *.db
+
+# Environment variables file (contains secrets — NEVER commit this)
+.env

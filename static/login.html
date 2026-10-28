@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,12 +38,10 @@
             right: -15px;
             bottom: -15px;
             z-index: -1;
-            background-image: 
-                linear-gradient(
-                    180deg,
+            background-image:
+                linear-gradient(180deg,
                     rgba(0, 0, 0, 0.32) 0%,
-                    rgba(0, 0, 0, 0.65) 100%
-                ),
+                    rgba(0, 0, 0, 0.65) 100%),
                 url("background.jpg"),
                 url("gym-bg.jpg"),
                 url("file:///C:/Users/HP/.gemini/antigravity/brain/d28b3168-3688-44e8-a6a2-6181c304c205/.user_uploaded/media_1790847620150.jpg");
@@ -280,6 +279,7 @@
         .checkbox-group label a:hover {
             color: var(--light-bg);
         }
+
         /* Floating Submit Button */
         .submit-btn {
             width: 100%;
@@ -329,6 +329,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <header>
@@ -362,25 +363,13 @@
                 <!-- Email -->
                 <div class="input-group">
                     <label for="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        placeholder="Enter email address" 
-                        required
-                    >
+                    <input type="email" id="email" name="email" placeholder="Enter email address" required>
                 </div>
 
                 <!-- Password -->
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        placeholder="Enter password" 
-                        required
-                    >
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
                 </div>
 
                 <!-- Confirm Password -->
@@ -406,12 +395,24 @@
 
                 <button type="submit" class="submit-btn">Continue</button>
 
-                <div style="margin-top: 14px; padding: 10px; background: rgba(237, 242, 244, 0.08); border-radius: 12px; border: 1px solid rgba(237, 242, 244, 0.12); font-size: 11px; text-align: left;">
-                    <div style="font-weight: 700; color: #ff758f; margin-bottom: 6px;">Demo Quick-Fill:</div>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                        <button type="button" style="background: rgba(239,35,60,0.25); border: 1px solid var(--red-accent); color: #fff; padding: 3px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;" onclick="fillCreds('admin@123', 'gym123')">👑 Owner/Admin</button>
-                        <button type="button" style="background: rgba(46,196,182,0.25); border: 1px solid #2ec4b6; color: #fff; padding: 3px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;" onclick="fillCreds('rohan.sharma@gmail.com', 'gym123')">🏋️ Member</button>
-                        <button type="button" style="background: rgba(255,159,28,0.25); border: 1px solid #ff9f1c; color: #fff; padding: 3px 8px; border-radius: 8px; cursor: pointer; font-size: 10px;" onclick="fillCreds('ananya.verma@titans.com', 'gym123')">📋 Trainer</button>
+                <!--
+                    DEMO PANEL — hidden by default (display:none below).
+                    The script below calls /api/demo-mode; if DEMO=on in .env,
+                    it makes this visible. If DEMO=off, it stays hidden.
+                -->
+                <div id="demo-panel"
+                    style="display:none; margin-top:14px; padding:10px; background:rgba(237,242,244,0.08); border-radius:12px; border:1px solid rgba(237,242,244,0.12); font-size:11px; text-align:left;">
+                    <div style="font-weight:700; color:#ff758f; margin-bottom:6px;">⚡ Demo Quick-Fill:</div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button type="button"
+                            style="background:rgba(239,35,60,0.25); border:1px solid var(--red-accent); color:#fff; padding:3px 8px; border-radius:8px; cursor:pointer; font-size:10px;"
+                            onclick="fillCreds('admin@123','gym123')">👑 Owner/Admin</button>
+                        <button type="button"
+                            style="background:rgba(46,196,182,0.25); border:1px solid #2ec4b6; color:#fff; padding:3px 8px; border-radius:8px; cursor:pointer; font-size:10px;"
+                            onclick="fillCreds('rohan.sharma@gmail.com','gym123')">🏋️ Member</button>
+                        <button type="button"
+                            style="background:rgba(255,159,28,0.25); border:1px solid #ff9f1c; color:#fff; padding:3px 8px; border-radius:8px; cursor:pointer; font-size:10px;"
+                            onclick="fillCreds('ananya.verma@titans.com','gym123')">📋 Trainer</button>
                     </div>
                 </div>
 
@@ -424,12 +425,33 @@
     </main>
 
     <script>
+        // ── Demo Quick-Fill ──────────────────────────────────────────────────
         function fillCreds(email, pwd) {
             document.getElementById('email').value = email;
             document.getElementById('password').value = pwd;
             document.getElementById('terms').checked = true;
         }
+
+        // ── Demo Mode Check ──────────────────────────────────────────────────
+        // Ask the server if DEMO=on is set in .env.
+        // ?t=... is a cache-buster — forces a fresh request every time.
+        // cache:'no-store' tells the browser not to cache this response.
+        async function checkDemoMode() {
+            try {
+                const res = await fetch('/api/demo-mode?t=' + Date.now(), {
+                    cache: 'no-store'
+                });
+                const data = await res.json();
+                if (data.demo === true) {
+                    document.getElementById('demo-panel').style.display = 'block';
+                }
+            } catch (_) {
+                // Server unreachable — keep the demo panel hidden
+            }
+        }
+        checkDemoMode();
     </script>
     <script src="script.js"></script>
 </body>
+
 </html>

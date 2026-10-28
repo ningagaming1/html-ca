@@ -71,6 +71,11 @@ async function validateForm(e) {
 
     const result = await response.json();
     if (response.ok) {
+      // Save the logged-in user to sessionStorage so dashboards can read
+      // their name and role for access control and personalisation.
+      if (result.user) {
+        saveSession(result.user);
+      }
       const targetUrl = result.redirect_url || "/member-dashboard.html";
       window.location.href = targetUrl;
       return true;

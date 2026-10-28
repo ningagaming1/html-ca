@@ -3,115 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - Titans Fitness Studio</title>
+    <title>Sign Up – Titans Fitness Studio</title>
+    <meta name="description" content="Create your Titans Fitness Studio account and start your fitness journey today.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* ── Design Tokens ── */
         :root {
-            --slate: #8d99ae;
-            --light-bg: #edf2f4;
-            --red-accent: #ef233c;
-            --crimson: #d80032;
+            --red:    #ef233c;
+            --crimson:#d80032;
+            --slate:  #8d99ae;
+            --light:  #edf2f4;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: var(--light-bg);
-            position: relative;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: var(--light);
             overflow-x: hidden;
         }
 
-        /* Blurred gym background retaining authentic colors with subtle darkening gradient */
+        /* ── Blurred Gym Background ── */
         body::before {
             content: "";
             position: fixed;
-            top: -15px;
-            left: -15px;
-            right: -15px;
-            bottom: -15px;
+            inset: -15px;
             z-index: -1;
-            background-image: 
-                linear-gradient(
-                    180deg,
-                    rgba(0, 0, 0, 0.35) 0%,
-                    rgba(0, 0, 0, 0.70) 100%
-                ),
-                url("background.jpg"),
-                url("gym-bg.jpg"),
-                url("file:///C:/Users/HP/.gemini/antigravity/brain/d28b3168-3688-44e8-a6a2-6181c304c205/.user_uploaded/media_1790847620150.jpg");
-            background-size: cover;
-            background-position: center center;
-            background-repeat: no-repeat;
+            background: linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.75) 100%),
+                        url("background.jpg") center/cover no-repeat;
             filter: blur(5px);
             transform: scale(1.04);
         }
 
-        /* Glass Header */
+        /* ── Header ── */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 14px 28px;
-            background: rgba(17, 21, 28, 0.45);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(17, 21, 28, 0.5);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(237, 242, 244, 0.12);
         }
+        header h1 { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+        header h1 span { color: var(--red); }
 
-        header h1 {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            color: var(--light-bg);
-        }
-
-        header h1 span {
-            color: var(--red-accent);
-        }
-
-        nav ul {
-            display: flex;
-            gap: 16px;
-            list-style: none;
-            align-items: center;
-        }
-
+        nav ul { display: flex; gap: 16px; list-style: none; align-items: center; }
         .nav-link {
             text-decoration: none;
-            color: var(--light-bg);
+            color: var(--light);
             font-size: 13px;
             font-weight: 600;
-            transition: color 0.2s ease;
+            transition: color 0.2s;
         }
-
-        .nav-link:hover {
-            color: var(--red-accent);
-        }
+        .nav-link:hover { color: var(--red); }
 
         .nav-btn {
-            background-color: var(--crimson);
-            color: var(--light-bg);
+            background: var(--crimson);
+            color: var(--light);
             text-decoration: none;
             font-weight: 700;
             font-size: 12px;
             padding: 6px 16px;
             border-radius: 18px;
-            transition: all 0.25s ease;
+            transition: background 0.25s, transform 0.25s;
         }
+        .nav-btn:hover { background: var(--red); transform: translateY(-1px); }
 
-        .nav-btn:hover {
-            background-color: var(--red-accent);
-            transform: translateY(-1px);
-        }
-
-        /* Main Container - Floating inputs, no solid card */
+        /* ── Main ── */
         main {
             flex: 1;
             display: flex;
@@ -124,31 +87,32 @@
             width: 100%;
             max-width: 320px;
             text-align: center;
+            /* Card slides up on page load */
+            animation: slideUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
-        /* Title & Subtitle */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0);    }
+        }
+
         .auth-container h2 {
             font-size: 26px;
             font-weight: 800;
-            color: var(--light-bg);
-            text-shadow: 0 3px 12px rgba(0, 0, 0, 0.65);
+            text-shadow: 0 3px 12px rgba(0,0,0,0.65);
             margin-bottom: 4px;
             letter-spacing: 0.5px;
         }
 
-        .auth-container p.subtitle {
-            color: rgba(237, 242, 244, 0.9);
+        .subtitle {
+            color: rgba(237, 242, 244, 0.88);
             font-size: 12px;
             margin-bottom: 18px;
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
 
-        /* Input Groups */
-        .input-group {
-            margin-bottom: 11px;
-            text-align: left;
-            position: relative;
-        }
+        /* ── Input Fields ── */
+        .input-group { margin-bottom: 11px; text-align: left; }
 
         label {
             display: block;
@@ -158,11 +122,9 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            color: var(--light-bg);
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.6);
         }
 
-        /* Floating Inputs */
         input[type="text"],
         input[type="email"],
         input[type="password"] {
@@ -174,76 +136,70 @@
             border: 1.5px solid transparent;
             border-radius: 20px;
             outline: none;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.32);
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        input::placeholder { color: var(--slate); font-size: 12px; }
 
-        input[type="text"]::placeholder,
-        input[type="email"]::placeholder,
-        input[type="password"]::placeholder {
-            color: var(--slate);
-            font-size: 12px;
-        }
-
-        /* Lift on hover & focus */
         input[type="text"]:hover,
         input[type="email"]:hover,
         input[type="password"]:hover {
-            background: #ffffff;
+            background: #fff;
             transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.38);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.38);
         }
 
         input[type="text"]:focus,
         input[type="email"]:focus,
         input[type="password"]:focus {
-            background: #ffffff;
-            border-color: var(--red-accent);
+            background: #fff;
+            border-color: var(--red);
             transform: translateY(-2px);
-            box-shadow: 0 10px 22px rgba(239, 35, 60, 0.4);
+            box-shadow: 0 10px 22px rgba(239, 35, 60, 0.42);
         }
 
-        /* Floating Checkbox for Terms and Conditions */
+        /* ── Inline Error Message ── */
+        /* Shown when the two password fields don't match */
+        .error-msg {
+            font-size: 11px;
+            font-weight: 700;
+            color: #ff6b81;
+            margin-top: 4px;
+            margin-left: 12px;
+            display: none;       /* hidden by default */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+        }
+
+        /* ── Terms Checkbox ── */
         .checkbox-group {
             display: flex;
             align-items: flex-start;
             gap: 10px;
-            margin: 14px 4px 14px 6px;
+            margin: 14px 6px;
             text-align: left;
         }
-
         .checkbox-group input[type="checkbox"] {
             appearance: none;
-            -webkit-appearance: none;
             width: 16px;
             height: 16px;
             min-width: 16px;
             margin-top: 2px;
             border-radius: 4px;
-            background-color: rgba(237, 242, 244, 0.92);
+            background: rgba(237, 242, 244, 0.92);
             border: 1.5px solid var(--slate);
             cursor: pointer;
-            outline: none;
             display: grid;
             place-content: center;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
-            transition: all 0.2s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+            transition: all 0.2s;
         }
-
         .checkbox-group input[type="checkbox"]:checked {
-            background-color: var(--crimson);
-            border-color: var(--red-accent);
+            background: var(--crimson);
+            border-color: var(--red);
         }
-
         .checkbox-group input[type="checkbox"]:checked::before {
-            content: "✓";
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: 800;
+            content: "✓"; color: #fff; font-size: 11px; font-weight: 800;
         }
-
         .checkbox-group label {
             display: inline;
             margin: 0;
@@ -252,37 +208,13 @@
             text-transform: none;
             letter-spacing: normal;
             line-height: 1.4;
-            color: var(--light-bg);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
             cursor: pointer;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
         }
+        .checkbox-group label a { color: #ff758f; text-decoration: underline; transition: color 0.2s; }
+        .checkbox-group label a:hover { color: var(--light); }
 
-        .checkbox-group label a {
-            color: #ff758f;
-            text-decoration: underline;
-            transition: color 0.2s ease;
-        }
-
-        .checkbox-group label a:hover {
-            color: var(--light-bg);
-        }
-
-        /* Match warning */
-        .status-msg {
-            font-size: 11px;
-            margin-top: 3px;
-            margin-left: 12px;
-            display: none;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-        }
-
-        .status-msg.error {
-            display: block;
-            color: #ff6b81;
-        }
-
-        /* Floating Submit Button */
+        /* ── Submit Button ── */
         .submit-btn {
             width: 100%;
             margin-top: 4px;
@@ -290,45 +222,35 @@
             font-size: 13px;
             font-weight: 700;
             letter-spacing: 0.5px;
-            color: var(--light-bg);
-            background: linear-gradient(135deg, var(--red-accent), var(--crimson));
+            color: var(--light);
+            background: linear-gradient(135deg, var(--red), var(--crimson));
             border: none;
             border-radius: 22px;
             cursor: pointer;
             box-shadow: 0 8px 18px rgba(216, 0, 50, 0.45);
-            transition: all 0.25s ease;
+            transition: all 0.25s;
         }
-
         .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 24px rgba(216, 0, 50, 0.55);
             background: linear-gradient(135deg, #ff3b53, var(--crimson));
         }
+        .submit-btn:active { transform: translateY(0); }
 
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Footer link to Login */
+        /* ── Footer Link ── */
         .auth-footer {
             margin-top: 16px;
             font-size: 12px;
-            color: var(--light-bg);
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-
         .auth-footer a {
             color: #ff758f;
             text-decoration: none;
             font-weight: 700;
             margin-left: 4px;
-            transition: color 0.2s ease;
+            transition: color 0.2s;
         }
-
-        .auth-footer a:hover {
-            color: var(--light-bg);
-            text-decoration: underline;
-        }
+        .auth-footer a:hover { color: var(--light); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -348,61 +270,47 @@
             <h2>Join the Titans</h2>
             <p class="subtitle">Start your fitness journey today</p>
 
+            <!-- handleSignup() is defined in script.js -->
             <form id="signup-form" onsubmit="return handleSignup(event)">
+
                 <!-- Username -->
                 <div class="input-group">
                     <label for="username">Username</label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        name="username" 
-                        placeholder="Choose a username" 
-                        required
-                    >
+                    <input type="text" id="username" name="username"
+                           placeholder="Choose a username" required>
                 </div>
 
                 <!-- Email -->
                 <div class="input-group">
                     <label for="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        placeholder="Enter your email" 
-                        required
-                    >
+                    <input type="email" id="email" name="email"
+                           placeholder="Enter your email" required>
                 </div>
 
                 <!-- Password -->
                 <div class="input-group">
                     <label for="password">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        placeholder="Create a password" 
-                        required
-                    >
+                    <input type="password" id="password" name="password"
+                           placeholder="Create a password" required>
                 </div>
 
                 <!-- Confirm Password -->
                 <div class="input-group">
                     <label for="confirm-password">Confirm Password</label>
-                    <input 
-                        type="password" 
-                        id="confirm-password" 
-                        name="confirm_password" 
-                        placeholder="Confirm your password" 
-                        required
-                    >
-                    <span id="password-match-error" class="status-msg error">Passwords do not match</span>
+                    <input type="password" id="confirm-password" name="confirm_password"
+                           placeholder="Re-enter your password" required>
+                    <!-- This error message appears if the passwords don't match -->
+                    <span id="password-match-error" class="error-msg">
+                        Passwords do not match
+                    </span>
                 </div>
 
-                <!-- Terms and Conditions Checkbox -->
+                <!-- Terms Checkbox -->
                 <div class="checkbox-group">
                     <input type="checkbox" id="terms" name="terms" required>
                     <label for="terms">
-                        I agree to the <a href="#">Terms and Conditions</a> & <a href="#">Privacy Policy</a>
+                        I agree to the <a href="#">Terms &amp; Conditions</a> and
+                        <a href="#">Privacy Policy</a>
                     </label>
                 </div>
 
@@ -412,72 +320,28 @@
                     <span>Already a member?</span>
                     <a href="login.html">Log In</a>
                 </div>
+
             </form>
         </div>
     </main>
 
     <script>
-        async function handleSignup(e) {
-            e.preventDefault();
-            const username = document.getElementById('username').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const terms = document.getElementById('terms').checked;
-            const errorMsg = document.getElementById('password-match-error');
-
-            if (password !== confirmPassword) {
-                errorMsg.style.display = 'block';
-                document.getElementById('confirm-password').focus();
-                return false;
-            }
-
-            if (!terms) {
-                alert('Please accept the Terms and Conditions to proceed.');
-                return false;
-            }
-
-            errorMsg.style.display = 'none';
-
-            try {
-                const res = await fetch("/api/signup", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        username: username,
-                        email: email,
-                        password: password,
-                        role: "member"
-                    })
-                });
-
-                const data = await res.json();
-                if (res.ok) {
-                    alert("Welcome to Titans Fitness Studio! Your account has been created.");
-                    window.location.href = 'login.html';
-                    return true;
-                } else {
-                    alert(data.detail || "Signup failed. Please try a different username/email.");
-                    return false;
-                }
-            } catch (err) {
-                console.error("Signup error:", err);
-                alert("Network error creating account.");
-                return false;
-            }
-        }
-
-        // Real-time password match feedback
-        document.getElementById('confirm-password').addEventListener('input', function() {
-            const password = document.getElementById('password').value;
-            const errorMsg = document.getElementById('password-match-error');
+        // ── Real-time password match feedback ──────────────────────────
+        // As the user types in the "Confirm Password" field,
+        // show or hide the error message instantly.
+        document.getElementById("confirm-password").addEventListener("input", function () {
+            const password = document.getElementById("password").value;
+            const errorMsg = document.getElementById("password-match-error");
+            // Show the error only if the field has a value AND it doesn't match
             if (this.value && this.value !== password) {
-                errorMsg.style.display = 'block';
+                errorMsg.style.display = "block";
             } else {
-                errorMsg.style.display = 'none';
+                errorMsg.style.display = "none";
             }
         });
     </script>
+
+    <!-- script.js contains handleSignup() and other shared logic -->
     <script src="script.js"></script>
 </body>
 </html>

@@ -1,21 +1,25 @@
 import requests
 import json
-import time
 import os
+import re
+
+# Load .env so OLLAMA_MODEL env var is available
+from dotenv import load_dotenv
+load_dotenv()
 
 try:
     from .prompt_builder import build_system_prompt
 except (ImportError, ValueError):
     from prompt_builder import build_system_prompt
 
-OLLAMA_URL = "http://localhost:11434/api/chat"
+OLLAMA_URL      = "http://localhost:11434/api/chat"
 OLLAMA_TAGS_URL = "http://localhost:11434/api/tags"
 
+# ──────────────────────────────────────────────────────────────
+# Model Selection
+# Uses OLLAMA_MODEL env var if set, otherwise auto-detects.
+# ──────────────────────────────────────────────────────────────
 def get_best_ollama_model() -> str:
-    """
-    Auto-detects the best available model in Ollama.
-    Prefers qwen2.5:3b on CPU for 3-4x faster response times, or respects OLLAMA_MODEL env var.
-    """
     env_override = os.getenv("OLLAMA_MODEL")
     if env_override:
         return env_override
@@ -24,7 +28,7 @@ def get_best_ollama_model() -> str:
         r = requests.get(OLLAMA_TAGS_URL, timeout=3)
         if r.status_code == 200:
             available = [m.get("name", "") for m in r.json().get("models", [])]
-            # Prefer 3b on CPU if available to prevent excessive swap latency
+            # Prefer smaller model on CPU — faster responses
             for candidate in ["qwen2.5:3b", "qwen2.5:7b"]:
                 for name in available:
                     if candidate in name:
@@ -36,114 +40,179 @@ def get_best_ollama_model() -> str:
 
     return "qwen2.5:3b"
 
-# Sensible options for responsive local CPU/GPU execution without memory thrashing
+
+# Ollama inference settings
 OLLAMA_OPTIONS = {
-    "num_ctx": 4096,     # Fits prompt and KV cache cleanly in RAM
-    "num_keep": -1,      # Retain loaded model in memory
-    "temperature": 0.3
+    "num_ctx": 4096,    # max tokens held in memory at once
+    "num_keep": -1,     # keep model loaded between requests
+    "temperature": 0.3  # lower = more focused / less random
 }
 
+# In-memory chat history per user session
 SESSION_MEMORY = {}
 
+
+# ──────────────────────────────────────────────────────────────
 # 1. Backend Tool Functions
+#    These are the real Python functions FitBuddy can trigger.
+# ──────────────────────────────────────────────────────────────
+
 def log_member_injury(member_id: int, injury_details: str):
-    print(f"\n[BACKEND EXECUTED] Logged injury for {member_id}: {injury_details}")
+    print(f"\n[BACKEND] Logged injury for member {member_id}: {injury_details}")
     return {"status": "success", "trainer_notified": True, "injury": injury_details}
 
 def recommend_available_trainers(preferred_specialty: str = "General"):
-    print(f"\n[BACKEND EXECUTED] Searching for {preferred_specialty} trainers...")
+    print(f"\n[BACKEND] Searching trainers for specialty: {preferred_specialty}")
     return [
-        {"name": "Coach Ananya Verma", "specialty": "Strength & Hypertrophy", "available_slots": 3},
-        {"name": "Coach Kabir Malhotra", "specialty": "HIIT & Conditioning", "available_slots": 2}
+        {"name": "Coach Ananya Verma",  "specialty": "Strength & Hypertrophy", "available_slots": 3},
+        {"name": "Coach Kabir Malhotra","specialty": "HIIT & Conditioning",     "available_slots": 2}
     ]
 
+# Map tool names (strings) → actual functions
 TOOL_MAP = {
-    "log_member_injury": log_member_injury,
+    "log_member_injury":           log_member_injury,
     "recommend_available_trainers": recommend_available_trainers
 }
 
+
+# ──────────────────────────────────────────────────────────────
+# 2. Session Initialization
+# ──────────────────────────────────────────────────────────────
+
 def initialize_user_memory(user_name: str, user_role: str, user_context: str) -> list[dict]:
-    """
-    Initializes user session with the structured system prompt.
-    Does not run blocking pre-requests with unrealistic timeouts.
-    """
+    """Builds the first system message for a new chat session."""
     raw_messages = build_system_prompt(user_name, user_role, user_context)
     full_text = "\n\n".join(m.get("content", "") for m in raw_messages if m.get("content"))
+    return [{"role": "system", "content": full_text}]
 
-    return [{
-        "role": "system",
-        "content": full_text
-    }]
+
+# ──────────────────────────────────────────────────────────────
+# 3. Health Check
+# ──────────────────────────────────────────────────────────────
 
 def check_ollama_status() -> bool:
-    """Checks if Ollama daemon is reachable on port 11434."""
+    """Returns True if the local Ollama server is reachable."""
     try:
         r = requests.get(OLLAMA_TAGS_URL, timeout=3)
         return r.status_code == 200
     except Exception:
         return False
 
+
+# ──────────────────────────────────────────────────────────────
+# 4. Offline Fallback Engine
+#    Used when Ollama is completely offline.
+#    Returns pre-written smart replies word-by-word (simulates streaming).
+# ──────────────────────────────────────────────────────────────
+
 def _generate_fallback_response(user_message: str, user_name: str, user_role: str, user_context: str):
-    """
-    Offline persona engine used ONLY when Ollama server is completely shut down.
-    """
     msg_lower = user_message.lower()
     role = (user_role or "member").lower()
 
     if role == "trainer" and any(k in msg_lower for k in ["diagnos", "medic", "injury report", "prescription"]):
         reply = (
-            f"Hey Coach {user_name}! I cannot provide medical advice or client clinical records—that's "
-            "outside my lane! Let's keep our focus on workout programming and strength progressions instead.\n\n"
-            "Which client's training block should we review next? 💪"
+            f"Hey Coach {user_name}! I cannot provide medical advice or clinical records — that's outside my lane. "
+            "Let's focus on workout programming instead.\n\nWhich client's training block should we review next? 💪"
         )
     elif role == "member" and any(k in msg_lower for k in ["pain", "tweaked", "sprain", "hurt", "injured", "sore back"]):
         log_member_injury(12611052, user_message)
         reply = (
-            f"Hey {user_name}! Please pause heavy loading immediately. ⚠️ I'm your fitness buddy, not a doctor! "
-            "Apply ice or heat for 15-20 minutes, avoid spinal compression, and consult a physiotherapist if pain persists. "
-            "I've logged this for your coach to review.\n\n"
-            "Did the pain start during the setup or on the lockout? 🩹"
+            f"Hey {user_name}! Please stop heavy loading immediately. ⚠️ Apply ice for 15–20 minutes and rest the area. "
+            "I've flagged this for your coach.\n\nDid the pain start during the setup or at the top of the movement? 🩹"
         )
-    elif "veg" in msg_lower or "diet" in msg_lower or "protein" in msg_lower:
+    elif any(k in msg_lower for k in ["veg", "diet", "protein"]):
         reply = (
-            f"Hey {user_name}! For high-protein Indian vegetarian meals, prioritize paneer bhurji, soya chunks pulao, "
-            "sprouted moong chilla, and whey protein after your session!\n\n"
-            "Would you like me to calculate your daily protein targets based on your goal? 🎯"
+            f"Hey {user_name}! For high-protein Indian vegetarian meals: paneer bhurji, soya chunks pulao, "
+            "sprouted moong chilla, and whey after your session are all great options.\n\n"
+            "Want me to estimate your daily protein target based on your goal? 🎯"
         )
-    elif "warmup" in msg_lower or "chest" in msg_lower:
+    elif any(k in msg_lower for k in ["warmup", "chest"]):
         reply = (
-            f"Hey {user_name}! Prime your shoulders with band pull-aparts, scapular push-ups, and 2 light warmup sets "
-            "before your working weight.\n\n"
-            "Are you focusing on flat bench strength or incline hypertrophy today? 🔥"
+            f"Hey {user_name}! Prime your shoulders with band pull-aparts, scapular push-ups, and 2 light warm-up sets "
+            "before your working weight.\n\nAre you going for flat bench strength or incline hypertrophy today? 🔥"
         )
     else:
         reply = (
-            f"Hey {user_name}! FitBuddy here. Consistency and progressive overload are key. Make sure to stay hydrated!\n\n"
-            "What exercise are you targeting next today? 💪"
+            f"Hey {user_name}! FitBuddy here. Consistency and progressive overload are the keys to progress. "
+            "Stay hydrated! 💪\n\nWhat exercise are you targeting next today?"
         )
 
+    # Yield word-by-word to simulate streaming
     for word in reply.split(" "):
         yield word + " "
 
+
+# ──────────────────────────────────────────────────────────────
+# 5. Tool Call Parser
+#    Extracts the JSON block from a model reply that contains
+#    a [TOOL_CALL] tag. Returns (text_before, tool_json_or_None).
+# ──────────────────────────────────────────────────────────────
+
+def _split_tool_call(full_text: str):
+    """
+    Splits a model reply into:
+      - The conversational text the user should see
+      - The tool call JSON block (or None if no tool call)
+
+    The model format from TOOLS.md is:
+        <conversational text>
+        [TOOL_CALL]
+        { "tool_name": "...", "parameters": { ... } }
+        [TOOL_CALL]
+    """
+    tag = "[TOOL_CALL]"
+    idx = full_text.find(tag)
+    if idx == -1:
+        return full_text, None  # no tool call at all
+
+    # Text before the first [TOOL_CALL] tag goes to the user
+    user_text = full_text[:idx].strip()
+
+    # Extract the JSON between the two [TOOL_CALL] tags
+    after_first_tag = full_text[idx + len(tag):]
+    end_idx = after_first_tag.find(tag)
+    raw_json = after_first_tag[:end_idx].strip() if end_idx != -1 else after_first_tag.strip()
+
+    # Strip inline comments (# ...) which are invalid JSON
+    clean_json = re.sub(r"#.*$", "", raw_json, flags=re.MULTILINE).strip()
+
+    try:
+        tool_data = json.loads(clean_json)
+    except json.JSONDecodeError:
+        # JSON was malformed — treat the whole thing as regular text
+        return full_text, None
+
+    return user_text, tool_data
+
+
+# ──────────────────────────────────────────────────────────────
+# 6. Main Streaming Entry Point
+# ──────────────────────────────────────────────────────────────
+
 def stream_fitbuddy(user_message: str, user_name: str, user_role: str, user_context: str = ""):
     """
-    Main entry point for conversational agent.
-    Streams directly from Ollama when available, with resilient streaming & tool calling.
+    Streams FitBuddy's reply token-by-token.
+
+    Strategy:
+    - Collect the FULL model response first (tokens arrive fast from local Ollama).
+    - Split it into "user-visible text" and optional "tool call JSON".
+    - Yield only the user-visible text to the browser.
+    - Execute the tool silently in the background.
+    - If a tool was called, make a second Ollama request for the natural follow-up reply.
     """
     session_key = f"{user_name}_{user_role}_{user_context}"
     ollama_online = check_ollama_status()
 
     if not ollama_online:
-        print(f"[FitBuddy Notice] Ollama is offline at {OLLAMA_URL}. Using offline fallback engine.")
-        for chunk in _generate_fallback_response(user_message, user_name, user_role, user_context):
-            yield chunk
+        print(f"[FitBuddy] Ollama is offline. Using fallback engine.")
+        yield from _generate_fallback_response(user_message, user_name, user_role, user_context)
         return
 
-    # Ollama is online: proceed with real local LLM streaming
     model_name = get_best_ollama_model()
-    print(f"[FitBuddy Agent] Streaming from Ollama model: '{model_name}'")
+    print(f"[FitBuddy] Streaming from model: '{model_name}'")
 
     try:
+        # Initialize session history if this is a new user
         if session_key not in SESSION_MEMORY:
             SESSION_MEMORY[session_key] = initialize_user_memory(user_name, user_role, user_context)
 
@@ -158,91 +227,84 @@ def stream_fitbuddy(user_message: str, user_name: str, user_role: str, user_cont
             "options": OLLAMA_OPTIONS
         }
 
-        # Generous timeout for CPU inference
+        # ── Step 1: Collect the full raw response ─────────────────
+        # We must collect everything before deciding what to show,
+        # because the [TOOL_CALL] tag may appear anywhere in the text.
         response = requests.post(OLLAMA_URL, json=payload, stream=True, timeout=120)
         response.raise_for_status()
 
-        text_buffer = ""
-        is_potential_json = False
-        is_tool_call = False
-
+        full_response = ""
         for line in response.iter_lines():
             if line:
                 chunk = json.loads(line)
-                content = chunk.get("message", {}).get("content", "")
+                token = chunk.get("message", {}).get("content", "")
+                if token:
+                    full_response += token
 
-                if content:
-                    text_buffer += content
-                    stripped = text_buffer.lstrip()
+        # ── Step 2: Split into visible text + tool call ───────────
+        user_visible_text, tool_data = _split_tool_call(full_response)
 
-                    # Intercept JSON tool calls if emitted
-                    if stripped.startswith("{") or stripped.startswith("[TOOL_CALL]"):
-                        is_potential_json = True
-                        if '"tool_name"' in stripped:
-                            is_tool_call = True
-                        continue
-                    elif not is_potential_json:
-                        yield content
+        # Save the full response to history (including the tool call,
+        # so the model remembers it called a tool)
+        messages.append({"role": "assistant", "content": full_response})
 
-        if is_potential_json and not is_tool_call:
-            yield text_buffer
+        # ── Step 3: Stream the user-visible part to the browser ───
+        # Yield word-by-word so the frontend still feels like streaming
+        if user_visible_text:
+            for word in user_visible_text.split(" "):
+                yield word + " "
 
-        messages.append({"role": "assistant", "content": text_buffer})
+        # ── Step 4: Execute the tool (if one was requested) ───────
+        if tool_data:
+            func_name = tool_data.get("tool_name")
+            args      = tool_data.get("parameters", {})
 
-        # Tool Execution if the model produced a tool call
-        if is_tool_call:
-            try:
-                import re
-                json_str = text_buffer[text_buffer.find("{"):text_buffer.rfind("}")+1]
-                clean_json = re.sub(r'#.*$', '', json_str, flags=re.MULTILINE)
-                extracted_tool = json.loads(clean_json)
+            print(f"[FitBuddy] Executing tool: '{func_name}' with args: {args}")
 
-                func_name = extracted_tool.get("tool_name")
-                args = extracted_tool.get("parameters", {})
+            if func_name in TOOL_MAP:
+                result = TOOL_MAP[func_name](**args)
+            else:
+                result = {"error": f"Tool '{func_name}' not found."}
 
-                print(f"[FitBuddy Agent] Executing Tool: {func_name} with {args}")
-                if func_name in TOOL_MAP:
-                    result = TOOL_MAP[func_name](**args)
-                else:
-                    result = {"error": f"Tool {func_name} not found."}
+            # Feed the tool result back to the model and get a natural reply
+            messages.append({
+                "role": "user",
+                "content": f"Tool Output:\n{json.dumps(result)}\nNow reply naturally to the user."
+            })
 
-                messages.append({
-                    "role": "user",
-                    "content": f"Tool Output:\n{json.dumps(result)}\nNow reply naturally to the user."
-                })
+            follow_up_payload = {
+                "model": model_name,
+                "messages": messages,
+                "stream": True,
+                "keep_alive": -1,
+                "options": OLLAMA_OPTIONS
+            }
 
-                final_payload = {
-                    "model": model_name,
-                    "messages": messages,
-                    "stream": True,
-                    "keep_alive": -1,
-                    "options": OLLAMA_OPTIONS
-                }
+            follow_up_reply = ""
+            with requests.post(OLLAMA_URL, json=follow_up_payload, stream=True, timeout=120) as stream_res:
+                stream_res.raise_for_status()
+                for line in stream_res.iter_lines():
+                    if line:
+                        chunk = json.loads(line)
+                        token = chunk.get("message", {}).get("content", "")
+                        if token:
+                            follow_up_reply += token
+                            yield token
 
-                final_reply = ""
-                with requests.post(OLLAMA_URL, json=final_payload, stream=True, timeout=120) as stream_res:
-                    stream_res.raise_for_status()
-                    for line in stream_res.iter_lines():
-                        if line:
-                            chunk = json.loads(line)
-                            final_content = chunk.get("message", {}).get("content", "")
-                            if final_content:
-                                final_reply += final_content
-                                yield final_content
-
-                messages.append({"role": "assistant", "content": final_reply})
-            except Exception as e:
-                print(f"[FitBuddy Tool Error] {e}")
+            messages.append({"role": "assistant", "content": follow_up_reply})
 
     except Exception as err:
-        print(f"[Ollama Runtime Error] {err}. Switching to fallback.")
-        for chunk in _generate_fallback_response(user_message, user_name, user_role, user_context):
-            yield chunk
+        print(f"[FitBuddy] Ollama error: {err}. Switching to fallback.")
+        yield from _generate_fallback_response(user_message, user_name, user_role, user_context)
 
+
+# ──────────────────────────────────────────────────────────────
+# Quick manual test — run: python runner.py
+# ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    print(f"Checking Ollama status: {check_ollama_status()}")
+    print(f"Ollama online: {check_ollama_status()}")
     print(f"Selected model: {get_best_ollama_model()}")
-    print("\n--- Testing stream_fitbuddy Live ---")
-    for token in stream_fitbuddy("Hello! I want a quick 3-exercise chest workout.", "Rohan Sharma", "member"):
+    print("\n--- Live Test ---")
+    for token in stream_fitbuddy("I tweaked my lower back on deadlifts today.", "Rohan Sharma", "member"):
         print(token, end="", flush=True)
     print("\n")
