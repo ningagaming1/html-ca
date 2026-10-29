@@ -29,11 +29,22 @@ from app.api.trainer import router as trainer_router
 from app.api.admin import router as admin_router
 
 # ──────────────────────────────────────────────────────────────
+from fastapi.middleware.cors import CORSMiddleware
+
 # Create the FastAPI app
 # ──────────────────────────────────────────────────────────────
 app = FastAPI(
     title="Titans Fitness Studio API",
     description="Backend API for Titans Fitness Studio dashboards and the FitBuddy AI assistant."
+)
+
+# Enable CORS for local development (Live Server, Vite, etc.)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Resolve the absolute path to the project root and static folder

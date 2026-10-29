@@ -12,10 +12,6 @@ def _read_md(filename: str) -> str:
     return f"[Warning: {filename} not found in {AGENT_DIR}]"
 
 def build_system_prompt(user_name: str, user_role: str, user_context: str = "") -> list:
-    """
-    Stitches the static agent rules with live user context from FastAPI/SQLite.
-    Returns the formatted message list ready for Qwen via Ollama.
-    """
     # 1. Load the static brain components
     soul = _read_md("SOUL.md")
     identity = _read_md("IDENTITY.md")

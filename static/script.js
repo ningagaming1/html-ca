@@ -51,8 +51,21 @@ async function loadFeedbackCards() {
   }
 }
 
+// Session helper to store user info in sessionStorage
+function saveSession(user) {
+  if (!user) return;
+  try {
+    sessionStorage.setItem("titans_user", JSON.stringify(user));
+  } catch (err) {
+    console.warn("Unable to save session to sessionStorage", err);
+  }
+}
+
+let isSubmittingLogin = false;
+
 async function validateForm(e) {
   if (e && e.preventDefault) e.preventDefault();
+  if (isSubmittingLogin) return false;
 
   const emailInput = document.querySelector("#email") || document.querySelector("#username");
   const passwordInput = document.querySelector("#password");
@@ -62,14 +75,30 @@ async function validateForm(e) {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
 
+  isSubmittingLogin = true;
   try {
-    const response = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email, username: email, password: password })
-    });
+    let response;
+    try {
+      response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email, username: email, password: password })
+      });
+    } catch (networkErr) {
+      console.error("Network connection error:", networkErr);
+      alert("Unable to connect to Titans server. Please ensure the server is running on http://localhost:8000.");
+      return false;
+    }
 
-    const result = await response.json();
+    let result;
+    try {
+      result = await response.json();
+    } catch (parseErr) {
+      console.error("JSON parsing error:", parseErr);
+      alert("Unexpected server response. Please try again.");
+      return false;
+    }
+
     if (response.ok) {
       // Save the logged-in user to sessionStorage so dashboards can read
       // their name and role for access control and personalisation.
@@ -84,9 +113,11 @@ async function validateForm(e) {
       return false;
     }
   } catch (err) {
-    console.error("Login request failed", err);
-    alert("Unable to connect to Titans server.");
+    console.error("Login processing error:", err);
+    alert("An error occurred during login: " + (err.message || "Please try again."));
     return false;
+  } finally {
+    isSubmittingLogin = false;
   }
 }
 
@@ -94,7 +125,10 @@ function initLoginForm() {
   const loginform = document.querySelector("#login-form") || document.querySelector("#auth-form");
   if (!loginform) return;
 
-  loginform.addEventListener("submit", validateForm);
+  // Prevent double-binding if onsubmit is defined in HTML
+  if (!loginform.getAttribute("onsubmit")) {
+    loginform.addEventListener("submit", validateForm);
+  }
 }
 
 // Global signup handler for signup.html

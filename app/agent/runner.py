@@ -43,8 +43,8 @@ def get_best_ollama_model() -> str:
 
 # Ollama inference settings
 OLLAMA_OPTIONS = {
-    "num_ctx": 4096,    # max tokens held in memory at once
-    "num_keep": -1,     # keep model loaded between requests
+    "num_ctx": 4096,    # memort
+    "num_keep": -1,     # idel
     "temperature": 0.3  # lower = more focused / less random
 }
 
